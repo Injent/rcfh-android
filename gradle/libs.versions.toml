@@ -1,0 +1,134 @@
+[versions]
+compileSdk = "35"
+targetSdk = "35"
+minSdk = "21"
+composeCompiler = "1.5.15"
+agp = "8.7.3"
+kotlin = "2.1.0"
+coreKtx = "1.15.0"
+activityCompose = "1.10.1"
+composeBom = "2025.03.00"
+ksp = "2.1.0-1.0.29"
+kotlinxSerialization = "1.6.3"
+kotlinxCoroutines = "1.10.1"
+kotlinxDate = "0.6.2"
+desugarJdkLibs = "2.1.5"
+work = "2.10.0"
+lifecycle = "2.8.7"
+room = "2.6.1"
+navigation = "2.8.9"
+splashScreen = "1.0.1"
+datastore = "1.1.3"
+firebaseBom = "33.10.0"
+firebasePlugin = "3.0.3"
+koinBom = "4.0.2"
+protobuf = "4.26.0"
+protobufPlugin = "0.9.4"
+ktor = "2.3.12"
+apiResult = "2.1.0"
+sheetsComposeDialogs = "1.3.0"
+arrowKt = "2.0.1"
+
+[libraries]
+
+# AndroidX core
+androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
+androidx-work = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "work" }
+androidx-window = { group = "androidx.window", name = "window", version = "1.4.0-rc01" }
+
+# Compose
+compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
+compose-adaptive = { group = "androidx.compose.material3.adaptive", name = "adaptive" }
+compose-foundation = { group = "androidx.compose.foundation", name = "foundation" }
+compose-material3 = { group = "androidx.compose.material3", name = "material3" }
+compose-runtime = { group = "androidx.compose.runtime", name = "runtime" }
+compose-ui = { group = "androidx.compose.ui", name = "ui" }
+compose-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
+compose-ui-text = { group = "androidx.compose.ui", name = "ui-text" }
+compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
+compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
+compose-ui-util = { group = "androidx.compose.ui", name = "ui-util" }
+compose-ui-testManifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
+
+# DataStore
+datastore = { group = "androidx.datastore", name = "datastore", version.ref = "datastore" }
+protobuf-kotlin-lite = { group = "com.google.protobuf", name = "protobuf-kotlin-lite", version.ref = "protobuf" }
+protobuf-protoc = { group = "com.google.protobuf", name = "protoc", version.ref = "protobuf" }
+
+# Desugaring
+desugarJdkLibs = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "desugarJdkLibs" }
+
+# Firebase
+firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics" }
+firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom"}
+firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics" }
+
+# Navigation
+navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigation" }
+
+# KotlinX
+kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinxCoroutines" }
+kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "kotlinxDate" }
+kotlinx-serialization = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
+
+# Ktor
+ktor-core = { group = "io.ktor", name = "ktor-client-core", version.ref = "ktor" }
+ktor-cio = { group = "io.ktor", name = "ktor-client-cio", version.ref = "ktor" }
+ktor-logging = { group = "io.ktor", name = "ktor-client-logging", version.ref = "ktor" }
+ktor-contentNegotiation = { group = "io.ktor", name = "ktor-client-content-negotiation", version.ref = "ktor" }
+ktor-kotlinx-json = { group = "io.ktor", name = "ktor-serialization-kotlinx-json", version.ref = "ktor" }
+ktor-auth = { group = "io.ktor", name = "ktor-client-auth", version.ref = "ktor" }
+
+# Koin
+koin-bom = { group = "io.insert-koin", name = "koin-bom", version.ref = "koinBom" }
+koin-android = { group = "io.insert-koin", name = "koin-android" }
+koin-compose = { group = "io.insert-koin", name = "koin-androidx-compose" }
+koin-workManager = { group = "io.insert-koin", name = "koin-androidx-workmanager" }
+koin-navigation = { group = "io.insert-koin", name = "koin-androidx-navigation" }
+
+# Lifecycle
+lifecycle-compose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "lifecycle" }
+lifecycle-livedata = { group = "androidx.lifecycle", name = "lifecycle-livedata-ktx", version.ref = "lifecycle" }
+lifecycle-runtimeKtx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycle" }
+lifecycle-viewModelCompose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "lifecycle" }
+lifecycle-viewModelKtx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycle" }
+
+# Arrow Kt
+arrowkt-optionals = { group = "io.arrow-kt", name = "arrow-optics", version.ref = "arrowKt" }
+arrowkt-optionals-ksp = { group = "io.arrow-kt", name = "arrow-optics-ksp-plugin", version.ref = "arrowKt" }
+
+# Room
+room = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
+room-ksp = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
+room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
+
+# Third-party
+apiResult = { group = "pro.respawn.apiresult", name = "core", version.ref = "apiResult" }
+sheetsComposeDialog-calendar = { group = "com.maxkeppeler.sheets-compose-dialogs", name = "calendar", version.ref = "sheetsComposeDialogs" }
+sheetsComposeDialog-core = { group = "com.maxkeppeler.sheets-compose-dialogs", name = "core", version.ref = "sheetsComposeDialogs" }
+
+# Build logic plugins
+android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "agp" }
+kotlin-gradlePlugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
+ksp-gradlePlugin = { group = "com.google.devtools.ksp", name = "com.google.devtools.ksp.gradle.plugin", version.ref = "ksp" }
+
+[plugins]
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+android-application = { id = "com.android.application", version.ref = "agp" }
+android-library = { id = "com.android.library", version.ref = "agp" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebasePlugin" }
+protobuf = { id = "com.google.protobuf", version.ref = "protobufPlugin" }
+
+# Project plugins
+rcfh-application = { id = "rcfh.application", version = "unspecified" }
+rcfh-application-compose = { id = "rcfh.application.compose", version = "unspecified" }
+rcfh-library = { id = "rcfh.library", version = "unspecified" }
+rcfh-library-compose = { id = "rcfh.library.compose", version = "unspecified" }
+rcfh-feature = { id = "rcfh.feature", version = "unspecified" }
+rcfh-koin = { id = "rcfh.koin", version = "unspecified" }
+rcfh-serialization = { id = "rcfh.serialization", version = "unspecified" }

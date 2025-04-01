@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="placeholder_input">Ввод…</string>
+    <string name="placeholder_reference">Выбор из справочника</string>
+    <string name="placeholder_int">0</string>
+    <string name="placeholder_float">0.0</string>
+    <string name="placeholder_date">ДД.ММ.ГГГГ</string>
+    <string name="button_add">Добавить</string>
+    <string name="error_invalidValue">Неправильное значение</string>
+    <string name="error_emptyValue">Пустое поле</string>
+</resources>
