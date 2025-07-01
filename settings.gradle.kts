@@ -23,7 +23,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "rcfh"
+rootProject.name = "GLPM"
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
@@ -34,10 +34,13 @@ include(":core:data")
 include(":core:datastore")
 include(":core:network")
 include(":core:common")
-include(":feature:forms")
 include(":core:navigation")
 include(":core:model")
-include(":feature:templates")
 include(":core:sync")
 include(":feature:login")
 include(":core:sdui")
+include(":feature:documents")
+include(":feature:home")
+include(":core:account")
+include(":feature:settings")
+include(":feature:form")

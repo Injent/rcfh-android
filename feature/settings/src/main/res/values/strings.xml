@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="title_settings">Настройки</string>
+    <string name="option_forest">Лесная</string>
+    <string name="option_light">Светлая</string>
+</resources>

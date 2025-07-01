@@ -22,9 +22,10 @@ class AndroidSyncManager(
     override fun requestSync() {
         workManager.enqueueUniqueWork(
             SYNC_WORK_NAME,
-            ExistingWorkPolicy.REPLACE,
+            ExistingWorkPolicy.KEEP,
             OneTimeWorkRequestBuilder<SyncWorker>()
                 .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+                .setConstraints(SyncWorkConstraints)
                 .build()
         )
     }

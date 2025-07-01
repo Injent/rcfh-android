@@ -20,6 +20,6 @@ val DatabaseModule = module {
 
     factory { get<AppDatabase>().handbookDao() }
     factory { get<AppDatabase>().referenceDao() }
-    factory { get<AppDatabase>().stateCacheDao() }
     factory { get<AppDatabase>().formDao() }
+    factory { get<AppDatabase>().documentDao() }
 }

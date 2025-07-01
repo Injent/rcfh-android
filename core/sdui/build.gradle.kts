@@ -5,12 +5,15 @@ plugins {
     alias(libs.plugins.rcfh.koin)
 }
 
-android.namespace = "ru.rcfh.core.sdui"
+android.namespace = "ru.rcfh.glpm.core.sdui"
 
 dependencies {
+    implementation(libs.compose.runtime)
     implementation(libs.kotlinx.coroutines.android)
-    implementation(libs.koin.compose)
+    implementation(libs.gms.location)
+    implementation(projects.core.account)
+    implementation(projects.core.common)
+    implementation(projects.core.datastore)
     implementation(projects.core.network)
     implementation(projects.core.database)
-    implementation(projects.core.designsystem)
 }

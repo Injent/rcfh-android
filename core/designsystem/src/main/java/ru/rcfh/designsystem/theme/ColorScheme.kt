@@ -27,9 +27,6 @@ class ColorScheme internal constructor(
     /** Background button for button's container color **/
     val backgroundTouchable: Color,
 
-    /** Background button for button's container color **/
-    val backgroundTouchablePressed: Color,
-
     /** Inverted background surface Eg. inverted Toast notification. **/
     val backgroundToast: Color,
 
@@ -42,7 +39,7 @@ class ColorScheme internal constructor(
     val foreground: Color,
 
     /** Brand foreground pressed **/
-    val foregroundPressed: Color,
+    val link: Color,
 
     /** Primary foreground color Eg. text/icons on buttons **/
     val foreground1: Color,
@@ -55,12 +52,6 @@ class ColorScheme internal constructor(
 
     /** Quaternary foreground color Eg. placeholder text **/
     val foreground4: Color,
-
-    /** Inverted foreground color Eg. inverted text on Toast **/
-    val foregroundInverted: Color,
-
-    /** Foreground for disabled components Eg. text/icon on disabled button **/
-    val foregroundDisabled: Color,
 
     /** Foreground surface on brand colors **/
     val foregroundOnBrand: Color,
@@ -88,37 +79,16 @@ class ColorScheme internal constructor(
     /** Brand Stroke **/
     val brandStroke: Color,
 
-    internal val isDarkTheme: Boolean
-)
+    val statusSuccess: Color,
 
-internal fun darkColorScheme() = ColorScheme(
-    backgroundBrand = Color(0xFF5696fd), // 0096ff
-    backgroundPressed = Color(0xFF046DD6),
-    background1 = Color(0xFF232229),
-    background2 = Color(0xFF16161A),
-    background3 = Color(0xFF1E1E24),
-    background4 = Color(0xFF101014),
-    backgroundToast = Color(0xFF434A55),
-    backgroundDisabled = Color(0xff53596C), //
-    backgroundTouchable = Color(0xFF232229), // 26262C
-    backgroundTouchablePressed = Color(0xFF393D4B),
-    foreground = Color(0xFF5696fd), //
-    foregroundPressed = Color(0xFF046DD6), //
-    foreground1 = Color(0xFFE9EBEE), //
-    foreground2 = Color(0xFF97A4BA), //
-    foreground3 = Color(0xFF646A7C), //
-    foreground4 = Color(0xff4D515B),
-    foregroundInverted = Color.White,
-    foregroundDisabled = Color(0xff53596C), //
-    foregroundOnBrand = Color.White,
-    stroke1 = Color(0xFF666666),
-    stroke2 = Color(0xFF2D2D2D), //
-    strokeAccessible = Color(0xFFADADAD),
-    strokeDisabled = Color(0xFF424242),
-    brandStroke = Color(0xFF5696fd), //
-    foregroundError = Color(0xFFFF453A), //
-    foregroundWarning = Color(0xFFFFC800),
-    isDarkTheme = true
+    val tableHeader: Color,
+
+    val paleRed: Color,
+    val paleRedBorder: Color,
+    val paleYellow: Color,
+    val paleYellowBorder: Color,
+
+    internal val isDarkTheme: Boolean
 )
 
 internal fun lightColorScheme() = ColorScheme(
@@ -131,15 +101,12 @@ internal fun lightColorScheme() = ColorScheme(
     backgroundToast = Color(0xff495368),
     backgroundDisabled = Color(0xFF9EAAC2), //
     backgroundTouchable = Color.White, //
-    backgroundTouchablePressed = Color(0xFFEBF2FC),
     foreground = Color(0xFF363636),
-    foregroundPressed = Color(0xFF046DD6),
+    link = Color(0xFF046DD6),
     foreground1 = Color(0xff1d1d1d), //
     foreground2 = Color(0xff566379), //
     foreground3 = Color(0xFF9099B1), //
     foreground4 = Color(0xFF888888), //
-    foregroundInverted = Color.White,
-    foregroundDisabled = Color(0xff97a4ba), //
     foregroundOnBrand = Color.White, //
     stroke1 = Color(0xFFD1D1D1),
     stroke2 = Color(0xffd5d5d5), //
@@ -148,6 +115,12 @@ internal fun lightColorScheme() = ColorScheme(
     brandStroke = Color(0xFF363636), //
     foregroundError = Color(0xFFFF3B30), //
     foregroundWarning = Color(0xFFFFB72A),
+    statusSuccess = Color(0xFF21a366),
+    tableHeader = Color(0xFFfafafb),
+    paleRed = Color(0xFFfcefea),
+    paleRedBorder = Color(0xFFe5cdc4),
+    paleYellow = Color(0xFFfff6ea),
+    paleYellowBorder = Color(0xFFeee2ba),
     isDarkTheme = false
 )
 

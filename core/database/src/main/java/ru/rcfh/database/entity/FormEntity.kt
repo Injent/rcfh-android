@@ -2,14 +2,13 @@ package ru.rcfh.database.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
-import androidx.room.PrimaryKey
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.buildJsonObject
 
-@Entity(tableName = "forms")
+@Entity(tableName = "forms", primaryKeys = ["document_id", "form_id"])
 data class FormEntity(
-    @PrimaryKey @ColumnInfo("id")
-    val id: Int,
-    @ColumnInfo("name")
-    val name: String,
-    @ColumnInfo("template_json")
-    val templateJson: String
+    @ColumnInfo("document_id") val documentId: Int,
+    @ColumnInfo("form_id") val formId: Int,
+    @ColumnInfo("is_valid") val isValid: Boolean,
+    @ColumnInfo("state") val state: JsonElement = buildJsonObject {}
 )

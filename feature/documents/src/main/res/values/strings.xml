@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="title_documents">Документы</string>
+    <string name="title_summarize">Результаты</string>
+    <string name="header_name">Имя</string>
+    <string name="header_modificationDate">Дата изменения</string>
+    <string name="header_isComplete">Заполнен</string>
+    <string name="unnamedDocumentName">Новый документ</string>
+    <string name="placeholder_documentName">Имя документа</string>
+    <string name="placeholder_noDocumentsOpened">Нет открытых документов</string>
+    <string name="error_emptyName">Пустое имя</string>
+    <string name="subtitle_forms">Формы</string>
+    <string name="button_createDocument">новый документ</string>
+    <string name="placeholder_noDocuments">У вас нет документов</string>
+    <string name="button_delete">удалить</string>
+    <string name="info_documentDeleted">Документ удален</string>
+    <string name="headline_success">Все хорошо</string>
+    <string name="text_success">Ошибок не найдено</string>
+    <string name="headline_warning">Поля не заполнены</string>
+    <string name="text_warning">%s не заполнено</string>
+    <string name="headline_severe">Ошибка в заполнении</string>
+    <string name="text_severe">%s неверно заполнено</string>
+    <string name="button_view">смотреть</string>
+    <string name="label_settings">Настройки</string>
+    <string name="label_guide">Руководство</string>
+    <string name="label_addAccount">Добавить аккаунт</string>
+    <string name="subheadline_severeProblem">Серьезная ошибка</string>
+    <string name="subheadline_warningProblem">Предупреждения</string>
+    <plurals name="fields">
+        <item quantity="zero">Нет полей</item>
+        <item quantity="one">%1$d поле</item>
+        <item quantity="two">%1$d поля</item>
+        <item quantity="few">%1$d поля</item>
+        <item quantity="many">%1$d полей</item>
+        <item quantity="other">%1$d полей</item>
+    </plurals>
+</resources>

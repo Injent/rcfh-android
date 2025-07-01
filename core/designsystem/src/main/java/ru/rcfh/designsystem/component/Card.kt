@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.material3.Text
@@ -30,8 +29,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import ru.rcfh.designsystem.icon.AppIcons
@@ -47,7 +44,7 @@ fun AppCard(
     onClick: (() -> Unit)? = null,
     color: Color = AppTheme.colorScheme.background1,
     shape: Shape = AppTheme.shapes.default,
-    shadowEnabled: Boolean = !AppTheme.colorScheme.isDarkTheme,
+    shadowEnabled: Boolean = false,
     contentPadding: PaddingValues = AppCardTokens.ContentPadding,
     contentColor: Color = Color.Unspecified,
     content: @Composable ColumnScope.() -> Unit
@@ -159,6 +156,7 @@ fun AppItemCard(
     modifier: Modifier = Modifier,
     tint: Color = AppTheme.colorScheme.foreground,
     icon: ImageVector? = null,
+    trailingIcon: (@Composable () -> Unit)? = null
 ) {
     AppCard(modifier, onClick) {
         Row(
@@ -182,11 +180,13 @@ fun AppItemCard(
                 modifier = Modifier.weight(1f)
             )
 
-            Icon(
-                imageVector = AppIcons.SmallArrowRight,
-                contentDescription = null,
-                tint = AppTheme.colorScheme.foreground3
-            )
+            trailingIcon?.invoke() ?: run {
+                Icon(
+                    imageVector = AppIcons.SmallArrowRight,
+                    contentDescription = null,
+                    tint = AppTheme.colorScheme.foreground3
+                )
+            }
         }
     }
 }

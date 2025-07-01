@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="placeholder_reference">Выбор из справочника</string>
+    <string name="placeholder_input">Ввод</string>
+    <string name="placeholder_int">0</string>
+    <string name="placeholder_float">0.0</string>
+    <string name="placeholder_date">ДД.ММ.ГГГГ</string>
+    <string name="button_add">Добавить</string>
+    <string name="button_delete">Удалить</string>
+    <string name="button_close">закрыть</string>
+    <string name="button_cancel">Отмена</string>
+    <string name="button_yes">Да</string>
+    <string name="info_changeTo">Использовать %s?</string>
+    <string name="error_invalidValue">Неправильное значение</string>
+    <string name="error_emptyValue">Пустое поле</string>
+    <string name="label_record">Запись %d</string>
+    <string name="button_openTable">Открыть таблицу</string>
+    <string name="info_recordDeleted">Запись удалена</string>
+    <string name="info_nothingFound">Ничего не найдено</string>
+    <string name="info_loading">Загрузка…</string>
+    <string name="reset">Сбросить</string>
+    <string name="actual">Фактические</string>
+    <string name="origin">По материалам ТО</string>
+    <string name="dialog_delete_title">Удалить запись №%d?</string>
+    <string name="dialog_delete_text">Все зависимые записи из других форм тоже будут удалены</string>
+    <string name="dialog_delete_confirm">Удалить</string>
+    <string name="info_pageDeleted">Запись №%d удалена</string>
+    <string name="dialog_delete_dismiss">Отмена</string>
+    <string name="info_startTyping">Начните печатать</string>
+    <string name="info_tableIsEmpty">Таблица пуста</string>
+    <string name="info_selectForm">Выбрать форму %s?</string>
+</resources>

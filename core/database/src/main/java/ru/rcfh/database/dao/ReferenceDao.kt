@@ -17,5 +17,5 @@ interface ReferenceDao {
         ORDER BY name
         LIMIT :size;
     """)
-    suspend fun search(handbookId: Int, query: String, size: Int = 50): List<ReferenceEntity>
+    suspend fun search(handbookId: Int, query: String, size: Int = 100): List<ReferenceEntity>
 }

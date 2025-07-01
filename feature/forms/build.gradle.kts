@@ -8,5 +8,6 @@ android.namespace = "ru.rcfh.feature.forms"
 dependencies {
     implementation(libs.sheetsComposeDialog.core)
     implementation(libs.sheetsComposeDialog.calendar)
-    implementation(projects.core.sdui)
+    implementation(libs.grid)
+    implementation(libs.gms.location)
 }

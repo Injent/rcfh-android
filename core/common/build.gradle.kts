@@ -9,4 +9,6 @@ dependencies {
     api(libs.apiResult)
     api(libs.kotlinx.datetime)
     api(libs.kotlinx.coroutines.android)
+    api(libs.kotlinx.collections.immutable)
+    api(libs.timber)
 }

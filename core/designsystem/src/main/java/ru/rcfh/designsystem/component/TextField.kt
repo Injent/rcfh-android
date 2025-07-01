@@ -12,31 +12,32 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.BasicSecureTextField
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.InputTransformation
 import androidx.compose.foundation.text.input.KeyboardActionHandler
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
-import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -55,61 +56,47 @@ import ru.rcfh.designsystem.icon.AppIcons
 import ru.rcfh.designsystem.icon.Calendar
 import ru.rcfh.designsystem.icon.Handbook
 import ru.rcfh.designsystem.theme.AppTheme
-import ru.rcfh.designsystem.util.thenIf
 
 @Composable
 fun ReferenceTextField(
-    state: TextFieldState,
+    value: String,
     onClick: () -> Unit,
+    modifier: Modifier = Modifier,
     placeholder: String = "",
-    errorMsg: String? = null,
+    error: String? = null,
     label: String? = null,
     onCard: Boolean = false,
-    modifier: Modifier = Modifier
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isFocused by interactionSource.collectIsFocusedAsState()
-    val lineLimits = TextFieldLineLimits.MultiLine()
 
     BasicTextField(
-        state = state,
+        value = value,
+        onValueChange = {},
         interactionSource = interactionSource,
         textStyle = AppTheme.typography.body.copy(color = AppTheme.colorScheme.foreground1),
-        lineLimits = lineLimits,
-        decorator = { innerTextField ->
+        readOnly = true,
+        visualTransformation = VisualTransformation.None,
+        decorationBox = { innerTextField ->
             TextFieldDecorator(
-                state = state,
                 innerTextField = innerTextField,
                 label = label,
-                errorMsg = errorMsg,
-                placeholder = placeholder,
                 isFocused = isFocused,
                 onCard = onCard,
-                lineLimits = lineLimits,
+                lineLimits = TextFieldLineLimits.MultiLine(),
+                placeholder = placeholder,
+                isEmpty = value.isEmpty(),
+                error = error,
                 button = {
-                    Surface(
-                        shape = AppTheme.shapes.default,
-                        color = if (onCard) {
-                            AppTheme.colorScheme.background2
-                        } else AppTheme.colorScheme.background4,
-                        onClick = onClick,
-                        modifier = Modifier
-                            .size(40.dp)
-                    ) {
-                        Box(contentAlignment = Alignment.Center) {
-                            Icon(
-                                imageVector = AppIcons.Handbook,
-                                contentDescription = null,
-                                tint = AppTheme.colorScheme.foreground,
-                                modifier = Modifier
-                                    .size(20.dp)
-                            )
-                        }
-                    }
+                    AppIconButton(
+                        icon = AppIcon(
+                            icon = AppIcons.Handbook,
+                            onClick = onClick,
+                        )
+                    )
                 }
             )
         },
-        readOnly = true,
         modifier = modifier
             .clickable(
                 interactionSource = interactionSource,
@@ -124,79 +111,153 @@ fun ReferenceTextField(
     )
 }
 
+private const val YEAR_FORMAT = "yyyy"
+
 @OptIn(FormatStringsInDatetimeFormats::class)
 @Composable
 fun DateTextField(
-    state: TextFieldState,
-    onValueChange: () -> Unit,
+    value: String,
+    onValueChange: (String) -> Unit,
     format: String,
+    modifier: Modifier = Modifier,
     label: String? = null,
-    errorMsg: String? = null,
     onCard: Boolean = false,
+    error: String? = null,
+    readOnly: Boolean = false,
     placeholder: String = "",
-    modifier: Modifier = Modifier
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isFocused by interactionSource.collectIsFocusedAsState()
     val calendarState = rememberUseCaseState()
+    var yearPickerDialogOpen by remember { mutableStateOf(false) }
+
+    fun openDialog() {
+        if (format == YEAR_FORMAT) {
+            yearPickerDialogOpen = true
+        } else {
+            calendarState.show()
+        }
+    }
 
     BasicTextField(
-        state = state,
+        value = value,
+        onValueChange = {},
         interactionSource = interactionSource,
         textStyle = AppTheme.typography.body.copy(color = AppTheme.colorScheme.foreground1),
-        lineLimits = TextFieldLineLimits.SingleLine,
-        decorator = { innerTextField ->
+        readOnly = true,
+        visualTransformation = VisualTransformation.None,
+        decorationBox = { innerTextField ->
             TextFieldDecorator(
-                state = state,
                 innerTextField = innerTextField,
                 label = label,
-                errorMsg = errorMsg,
-                placeholder = placeholder,
                 isFocused = isFocused,
                 onCard = onCard,
+                placeholder = placeholder,
                 button = {
-                    Surface(
-                        shape = AppTheme.shapes.default,
-                        color = if (onCard) {
-                            AppTheme.colorScheme.background2
-                        } else AppTheme.colorScheme.background4,
-                        onClick = calendarState::show,
-                        modifier = Modifier
-                            .size(40.dp)
-                    ) {
-                        Box(contentAlignment = Alignment.Center) {
-                            Icon(
-                                imageVector = AppIcons.Calendar,
-                                contentDescription = null,
-                                tint = AppTheme.colorScheme.foreground,
-                                modifier = Modifier
-                                    .size(20.dp)
-                            )
-                        }
+                    AppIconButton(
+                        icon = AppIcon(
+                            icon = AppIcons.Calendar,
+                            onClick = ::openDialog,
+                        )
+                    )
+                },
+                error = error,
+                isEmpty = value.isEmpty(),
+                modifier = Modifier
+                    .clickable {
+                        if (!readOnly) openDialog()
                     }
-                }
             )
         },
-        readOnly = true,
         modifier = modifier
-            .focusable()
-            .onFocusChanged { state ->
-                if (state.isFocused) {
-                    calendarState.show()
+            .onFocusChanged { focusState ->
+                if (focusState.isFocused && !readOnly) {
+                    openDialog()
                 }
             }
+            .focusable()
     )
 
-    AppCalendarDialog(
-        state = calendarState,
-        format = format,
-        onSelectDate = { date ->
-            onValueChange()
-            state.setTextAndPlaceCursorAtEnd(
-                date.format(LocalDate.Format { byUnicodePattern(format) })
+    if (format.equals(YEAR_FORMAT, ignoreCase = true) && yearPickerDialogOpen) {
+        YearPickerDialog(
+            onSelect = { year ->
+                onValueChange(year.toString())
+                yearPickerDialogOpen = false
+            },
+            onDismiss = {
+                yearPickerDialogOpen = false
+            }
+        )
+    } else {
+        AppCalendarDialog(
+            state = calendarState,
+            format = format,
+            onSelectDate = { date ->
+                onValueChange(date.format(LocalDate.Format { byUnicodePattern(format) }))
+                calendarState.finish()
+            }
+        )
+    }
+}
+
+@Composable
+fun AppTextField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    placeholder: String = "",
+    inputTransformation: (String) -> Boolean = { true },
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
+    lineLimits: TextFieldLineLimits = TextFieldLineLimits.SingleLine,
+    leadingIcon: (@Composable () -> Unit)? = null,
+    trailingIcon: @Composable () -> Unit = {},
+    onCard: Boolean = false,
+    label: String? = null,
+    error: String? = null,
+    readOnly: Boolean = false,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    button: @Composable (() -> Unit)? = null,
+) {
+    val isFocused by interactionSource.collectIsFocusedAsState()
+
+    BasicTextField(
+        value = value,
+        onValueChange = {
+            if (inputTransformation(it)) {
+                onValueChange(it)
+            }
+        },
+        interactionSource = interactionSource,
+        keyboardOptions = keyboardOptions,
+        keyboardActions = keyboardActions,
+        textStyle = AppTheme.typography.body.copy(color = AppTheme.colorScheme.foreground1),
+        minLines = when (lineLimits) {
+            is TextFieldLineLimits.MultiLine -> lineLimits.minHeightInLines
+            TextFieldLineLimits.SingleLine -> 1
+        },
+        maxLines = when (lineLimits) {
+            is TextFieldLineLimits.MultiLine -> lineLimits.maxHeightInLines
+            TextFieldLineLimits.SingleLine -> 1
+        },
+        readOnly = readOnly,
+        visualTransformation = VisualTransformation.None,
+        decorationBox = { innerTextField ->
+            TextFieldDecorator(
+                innerTextField = innerTextField,
+                label = label,
+                trailingIcon = trailingIcon,
+                isFocused = isFocused,
+                leadingIcon = leadingIcon,
+                onCard = onCard,
+                placeholder = placeholder,
+                lineLimits = lineLimits,
+                isEmpty = value.isEmpty(),
+                button = button,
+                error = error,
             )
-            calendarState.finish()
-        }
+        },
+        modifier = modifier
     )
 }
 
@@ -210,33 +271,31 @@ fun AppTextField(
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     onKeyboardAction: KeyboardActionHandler? = null,
     lineLimits: TextFieldLineLimits = TextFieldLineLimits.SingleLine,
-    leadingIcon: @Composable () -> Unit = {},
+    leadingIcon: (@Composable () -> Unit)? = null,
     trailingIcon: @Composable () -> Unit = {},
     onCard: Boolean = false,
     label: String? = null,
-    digitPlaceholder: Boolean = false,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
 ) {
-    val mutableInteractionSource = remember { MutableInteractionSource() }
-    val isFocused by mutableInteractionSource.collectIsFocusedAsState()
+    val isFocused by interactionSource.collectIsFocusedAsState()
 
     BasicTextField(
         state = state,
-        interactionSource = mutableInteractionSource,
+        interactionSource = interactionSource,
         keyboardOptions = keyboardOptions,
         onKeyboardAction = onKeyboardAction,
         decorator = { innerTextField ->
             TextFieldDecorator(
-                state = state,
                 innerTextField = innerTextField,
                 label = label,
                 trailingIcon = trailingIcon,
-                placeholder = placeholder,
-                errorMsg = error,
                 isFocused = isFocused,
                 leadingIcon = leadingIcon,
                 onCard = onCard,
-                digitPlaceholder = digitPlaceholder,
-                lineLimits = lineLimits
+                lineLimits = lineLimits,
+                placeholder = placeholder,
+                isEmpty = state.text.isEmpty(),
+                error = error
             )
         },
         textStyle = AppTheme.typography.body.copy(color = AppTheme.colorScheme.foreground1),
@@ -256,6 +315,8 @@ fun AppSecureTextField(
     inputTransformation: InputTransformation? = null,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     onKeyboardAction: KeyboardActionHandler? = null,
+    onCard: Boolean = false,
+    leadingIcon: (@Composable () -> Unit)? = null,
     label: String? = null
 ) {
     val mutableInteractionSource = remember { MutableInteractionSource() }
@@ -268,13 +329,15 @@ fun AppSecureTextField(
         onKeyboardAction = onKeyboardAction,
         decorator = { innerTextField ->
             TextFieldDecorator(
-                state = state,
                 innerTextField = innerTextField,
                 label = label,
                 trailingIcon = trailingIcon,
+                isFocused = isFocused,
+                leadingIcon = leadingIcon,
+                onCard = onCard,
                 placeholder = placeholder,
-                errorMsg = error,
-                isFocused = isFocused
+                isEmpty = state.text.isEmpty(),
+                error = error
             )
         },
         textStyle = AppTheme.typography.body.copy(color = AppTheme.colorScheme.foreground1),
@@ -285,48 +348,45 @@ fun AppSecureTextField(
 
 @Composable
 private fun TextFieldDecorator(
-    state: TextFieldState,
+    isEmpty: Boolean,
     innerTextField: @Composable () -> Unit,
     modifier: Modifier = Modifier,
     label: String? = null,
     button: (@Composable () -> Unit)? = null,
     trailingIcon: @Composable () -> Unit = {},
-    leadingIcon: @Composable () -> Unit = {},
-    placeholder: String = "",
-    errorMsg: String? = null,
+    leadingIcon: (@Composable () -> Unit)? = null,
     isFocused: Boolean = false,
     onCard: Boolean = false,
-    digitPlaceholder: Boolean = false,
+    placeholder: String = "",
+    error: String? = null,
     lineLimits: TextFieldLineLimits = TextFieldLineLimits.SingleLine,
 ) {
     Column(modifier) {
         label?.let {
             val subtitleColor = AppTheme.colorScheme.foreground2
             Text(
-                text = remember(label) {
-                    buildAnnotatedString {
-                        addStyle(
-                            style = SpanStyle(fontSize = 11.sp),
-                            start = label.indexOfFirst { it == '(' }.takeIf { it != -1 } ?: 0,
-                            end = label.indexOfLast { it == ')' }.takeIf { it != -1 }?.plus(1) ?: 0
-                        )
+                text = buildAnnotatedString {
+                    addStyle(
+                        style = SpanStyle(fontSize = 11.sp),
+                        start = label.indexOfFirst { it == '(' }.takeIf { it != -1 } ?: 0,
+                        end = label.indexOfLast { it == ')' }.takeIf { it != -1 }?.plus(1) ?: 0
+                    )
 
-                        if (label.count { it == '\n' } == 1) {
-                            val (title, subtitle) = label.split('\n')
+                    if (label.count { it == '\n' } == 1) {
+                        val (title, subtitle) = label.split('\n')
 
-                            append(title)
-                            withStyle(
-                                SpanStyle(
-                                    color = subtitleColor,
-                                    fontSize = 12.sp
-                                )
-                            ) {
-                                appendLine()
-                                append(subtitle)
-                            }
-                        } else {
-                            append(label)
+                        append(title)
+                        withStyle(
+                            SpanStyle(
+                                color = subtitleColor,
+                                fontSize = 12.sp
+                            )
+                        ) {
+                            appendLine()
+                            append(subtitle)
                         }
+                    } else {
+                        append(label)
                     }
                 },
                 style = AppTheme.typography.callout.copy(lineHeight = 12.sp),
@@ -338,6 +398,20 @@ private fun TextFieldDecorator(
         Row(
             horizontalArrangement = Arrangement.spacedBy(AppTheme.spacing.m)
         ) {
+            val borderWidth = remember(error, isFocused) {
+                when {
+                    error != null -> 1.2.dp
+                    isFocused -> 1.dp
+                    else -> 0.dp
+                }
+            }
+
+            val borderColor = when {
+                error != null -> AppTheme.colorScheme.foregroundError
+                isFocused -> AppTheme.colorScheme.stroke1
+                else -> Color.Transparent
+            }
+
             Row(
                 horizontalArrangement = Arrangement.spacedBy(AppTheme.spacing.s),
                 verticalAlignment = Alignment.CenterVertically,
@@ -349,28 +423,27 @@ private fun TextFieldDecorator(
                         } else AppTheme.colorScheme.background4,
                         AppTheme.shapes.small
                     )
-                    .thenIf(errorMsg != null) {
-                        border(
-                            width = 1.2.dp,
-                            color = AppTheme.colorScheme.foregroundError,
-                            shape = AppTheme.shapes.small
-                        )
-                    }
-                    .thenIf(isFocused && errorMsg == null) {
-                        border(
-                            width = 1.dp,
-                            color = AppTheme.colorScheme.stroke1,
-                            shape = AppTheme.shapes.small
-                        )
-                    }
+                    .border(
+                        width = borderWidth,
+                        color = borderColor,
+                        shape = AppTheme.shapes.small
+                    )
                     .padding(horizontal = AppTheme.spacing.m)
                     .weight(1f)
             ) {
-                CompositionLocalProvider(
-                    LocalContentColor provides AppTheme.colorScheme.foreground2
-                ) {
-                    leadingIcon()
+                leadingIcon?.let { icon ->
+                    Box(
+                        modifier = Modifier
+                            .padding(end = AppTheme.spacing.xs)
+                    ) {
+                        CompositionLocalProvider(
+                            LocalContentColor provides AppTheme.colorScheme.foreground2
+                        ) {
+                            icon()
+                        }
+                    }
                 }
+
                 Box(
                     contentAlignment = when (lineLimits) {
                         is TextFieldLineLimits.MultiLine -> Alignment.TopStart
@@ -378,37 +451,23 @@ private fun TextFieldDecorator(
                     },
                     modifier = Modifier
                         .weight(1f)
-                        .thenIf(lineLimits is TextFieldLineLimits.MultiLine) {
-                            padding(vertical = AppTheme.spacing.mNudge)
-                        }
+                        .then(
+                            if (lineLimits is TextFieldLineLimits.MultiLine) {
+                                Modifier.padding(vertical = AppTheme.spacing.mNudge)
+                            } else {
+                                Modifier
+                            }
+                        )
                 ) {
                     innerTextField()
-
-                    if (digitPlaceholder) {
-                        Text(
-                            text = remember(state.text, placeholder) {
-                                buildAnnotatedString {
-                                    addStyle(
-                                        style = SpanStyle(color = Color.Transparent),
-                                        start = 0,
-                                        end = state.text.length.coerceAtMost(placeholder.length)
-                                    )
-                                    append(placeholder)
-                                }
-                            },
-                            style = AppTheme.typography.body,
-                            minLines = 1,
-                            color = AppTheme.colorScheme.foreground4,
+                    Text(
+                        text = placeholder,
+                        style = AppTheme.typography.body,
+                        color = AppTheme.colorScheme.foreground4,
+                        modifier = Modifier.alpha(
+                            if (isEmpty) 1f else 0f
                         )
-                    } else if (state.text.isEmpty()) {
-                        Text(
-                            text = placeholder,
-                            style = AppTheme.typography.body,
-                            minLines = 1,
-                            color = AppTheme.colorScheme.foreground4,
-                        )
-                    }
-
+                    )
                 }
 
                 CompositionLocalProvider(
@@ -420,13 +479,13 @@ private fun TextFieldDecorator(
             button?.invoke()
         }
 
-        errorMsg?.let {
+        error?.let {
             Text(
-                text = it,
-                style = AppTheme.typography.footnote,
+                text = error,
+                style = AppTheme.typography.callout,
                 color = AppTheme.colorScheme.foregroundError,
                 modifier = Modifier
-                    .padding(top = AppTheme.spacing.xxs)
+                    .padding(top = AppTheme.spacing.xs)
             )
         }
     }

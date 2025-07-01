@@ -5,13 +5,15 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
@@ -100,7 +102,7 @@ fun AppSecondaryLargeButton(
         shape = shape,
         enabled = enabled,
         color = if (enabled) {
-            AppTheme.colorScheme.background1
+            AppTheme.colorScheme.background2
         } else AppTheme.colorScheme.backgroundDisabled,
         modifier = modifier
             .height(60.dp)
@@ -132,13 +134,37 @@ fun AppSecondaryLargeButton(
 }
 
 @Composable
+fun AppSmallButton(
+    text: String,
+    onClick: () -> Unit,
+    shape: Shape = CircleShape,
+    modifier: Modifier = Modifier
+) {
+    Button(
+        onClick = onClick,
+        shape = shape,
+        colors = ButtonDefaults.filledTonalButtonColors(
+            containerColor = AppTheme.colorScheme.backgroundBrand,
+            contentColor = AppTheme.colorScheme.foregroundOnBrand
+        ),
+        modifier = modifier
+    ) {
+        Text(
+            text = text,
+            style = AppTheme.typography.calloutButton,
+        )
+    }
+}
+
+@Composable
 fun AppTextButton(
     text: String,
     onClick: () -> Unit,
+    modifier: Modifier = Modifier,
     enabled: Boolean = true,
     loading: Boolean = false,
     shape: Shape = AppTheme.shapes.default,
-    modifier: Modifier = Modifier
+    color: Color = AppTheme.colorScheme.link,
 ) {
     Surface(
         onClick = {
@@ -153,14 +179,14 @@ fun AppTextButton(
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
-                .padding(horizontal = AppTheme.spacing.xl)
+                .padding(horizontal = AppTheme.spacing.l)
         ) {
             AppTextWithLoading(
                 text = text,
                 loadingSize = 26.dp,
                 isLoading = loading,
                 textStyle = AppTheme.typography.subheadlineButton,
-                color = AppTheme.colorScheme.foreground
+                color = color
             )
         }
     }
@@ -174,24 +200,25 @@ fun AppBackButton(
     val view = LocalView.current
 
     Surface(
-        color = Color.Transparent,
-        shape = AppTheme.shapes.default,
+        color = AppTheme.colorScheme.background1,
+        shape = AppTheme.shapes.large,
         onClick = {
             onClick()
             view.playSoundEffect(SoundEffectConstants.CLICK)
         },
         modifier = modifier
+            .size(40.dp)
     ) {
         Box(
-            Modifier.padding(PaddingValues(10.dp))
+            contentAlignment = Alignment.Center,
         ) {
             Icon(
                 imageVector = AppIcons.Back,
                 contentDescription = null,
-                tint = AppTheme.colorScheme.foreground3,
+                tint = AppTheme.colorScheme.foreground2,
                 modifier = Modifier
                     .align(Alignment.Center)
-                    .size(18.dp)
+                    .size(20.dp)
             )
         }
     }

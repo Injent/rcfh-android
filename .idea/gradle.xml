@@ -28,6 +28,7 @@
             <option value="$PROJECT_DIR$/build-logic/plugins" />
             <option value="$PROJECT_DIR$/build-logic/plugins/convention" />
             <option value="$PROJECT_DIR$/core" />
+            <option value="$PROJECT_DIR$/core/account" />
             <option value="$PROJECT_DIR$/core/common" />
             <option value="$PROJECT_DIR$/core/data" />
             <option value="$PROJECT_DIR$/core/database" />
@@ -39,12 +40,13 @@
             <option value="$PROJECT_DIR$/core/sdui" />
             <option value="$PROJECT_DIR$/core/sync" />
             <option value="$PROJECT_DIR$/feature" />
-            <option value="$PROJECT_DIR$/feature/forms" />
+            <option value="$PROJECT_DIR$/feature/documents" />
+            <option value="$PROJECT_DIR$/feature/form" />
+            <option value="$PROJECT_DIR$/feature/home" />
             <option value="$PROJECT_DIR$/feature/login" />
-            <option value="$PROJECT_DIR$/feature/templates" />
+            <option value="$PROJECT_DIR$/feature/settings" />
           </set>
         </option>
-        <option name="resolveExternalAnnotations" value="false" />
       </GradleProjectSettings>
     </option>
   </component>

@@ -17,16 +17,16 @@ object Navigator {
     private val _navigationActions = Channel<NavigationAction>()
     val navigationActions = _navigationActions.receiveAsFlow()
 
-    fun navigate(route: Any, navOptions: (NavOptionsBuilder.() -> Unit)? = null) {
-        _navigationActions.trySend(
+    suspend fun navigate(route: Any, navOptions: (NavOptionsBuilder.() -> Unit)? = null) {
+        _navigationActions.send(
             NavigationAction.Navigate(
             destination = route,
             navOptions = navOptions ?: {}
         ))
     }
 
-    fun navigateUp() {
-        _navigationActions.trySend(NavigationAction.NavigateUp)
+    suspend fun navigateUp() {
+        _navigationActions.send(NavigationAction.NavigateUp)
     }
 }
 

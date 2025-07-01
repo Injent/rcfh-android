@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "b44985167fd147ac573e8de118b91b96",
+    "identityHash": "e24cb1d65e2daf7f616bd7b000a37c36",
     "entities": [
       {
         "tableName": "handbooks",
@@ -86,14 +86,14 @@
         ]
       },
       {
-        "tableName": "forms",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `name` TEXT NOT NULL, `template_json` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "tableName": "documents",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `name` TEXT NOT NULL, `modification_timestamp` INTEGER NOT NULL, `owner_id` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
             "columnName": "id",
             "affinity": "INTEGER",
-            "notNull": true
+            "notNull": false
           },
           {
             "fieldPath": "name",
@@ -102,14 +102,20 @@
             "notNull": true
           },
           {
-            "fieldPath": "templateJson",
-            "columnName": "template_json",
-            "affinity": "TEXT",
+            "fieldPath": "modificationTimestamp",
+            "columnName": "modification_timestamp",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ownerId",
+            "columnName": "owner_id",
+            "affinity": "INTEGER",
             "notNull": true
           }
         ],
         "primaryKey": {
-          "autoGenerate": false,
+          "autoGenerate": true,
           "columnNames": [
             "id"
           ]
@@ -118,24 +124,30 @@
         "foreignKeys": []
       },
       {
-        "tableName": "cache_state",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`draft_id` TEXT NOT NULL, `path` TEXT NOT NULL, `value` TEXT NOT NULL, PRIMARY KEY(`draft_id`, `path`))",
+        "tableName": "forms",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`document_id` INTEGER NOT NULL, `form_id` INTEGER NOT NULL, `is_valid` INTEGER NOT NULL, `state` TEXT NOT NULL, PRIMARY KEY(`document_id`, `form_id`))",
         "fields": [
           {
-            "fieldPath": "draftId",
-            "columnName": "draft_id",
-            "affinity": "TEXT",
+            "fieldPath": "documentId",
+            "columnName": "document_id",
+            "affinity": "INTEGER",
             "notNull": true
           },
           {
-            "fieldPath": "path",
-            "columnName": "path",
-            "affinity": "TEXT",
+            "fieldPath": "formId",
+            "columnName": "form_id",
+            "affinity": "INTEGER",
             "notNull": true
           },
           {
-            "fieldPath": "value",
-            "columnName": "value",
+            "fieldPath": "isValid",
+            "columnName": "is_valid",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "stateJson",
+            "columnName": "state",
             "affinity": "TEXT",
             "notNull": true
           }
@@ -143,8 +155,8 @@
         "primaryKey": {
           "autoGenerate": false,
           "columnNames": [
-            "draft_id",
-            "path"
+            "document_id",
+            "form_id"
           ]
         },
         "indices": [],
@@ -154,7 +166,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b44985167fd147ac573e8de118b91b96')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'e24cb1d65e2daf7f616bd7b000a37c36')"
     ]
   }
 }

@@ -1,50 +1,70 @@
 package ru.rcfh.designsystem.theme
 
 import android.app.Activity
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
+import com.valentinilk.shimmer.LocalShimmerTheme
+import com.valentinilk.shimmer.defaultShimmerTheme
+import ru.rcfh.core.model.UiTheme
 
 object AppTheme {
     val colorScheme: ColorScheme
-        @Composable get() = LocalAppColorScheme.current
+        @Composable
+        @ReadOnlyComposable
+        get() = LocalAppColorScheme.current
     val shapes: Shapes
-        @Composable get() = LocalShapes.current
+        @Composable
+        @ReadOnlyComposable
+        get() = LocalShapes.current
     val spacing: Spacing
-        @Composable get() = LocalSpacing.current
+        @Composable
+        @ReadOnlyComposable
+        get() = LocalSpacing.current
     val typography: Typography
-        @Composable get() = LocalTypography.current
+        @Composable
+        @ReadOnlyComposable
+        get() = LocalTypography.current
 }
 
 @Composable
 fun AppTheme(
-    darkTheme: Boolean = false,
+    uiTheme: UiTheme = UiTheme.LIGHT,
     content: @Composable () -> Unit
 ) {
     val view = LocalView.current
 
-    val colorScheme = if (darkTheme) darkColorScheme() else lightColorScheme()
+    val colorScheme = lightColorScheme()
 
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
             val insetsController = WindowCompat.getInsetsController(window, view)
-            insetsController.isAppearanceLightStatusBars = !darkTheme
-            insetsController.isAppearanceLightNavigationBars = !darkTheme
+            insetsController.isAppearanceLightStatusBars = !colorScheme.isDarkTheme
+            insetsController.isAppearanceLightNavigationBars = !colorScheme.isDarkTheme
             window.decorView.setBackgroundColor(colorScheme.background2.toArgb())
         }
     }
+    val shimmerTheme = defaultShimmerTheme.copy(
+        shaderColors = listOf(
+            Color.White.copy(alpha = 0.5f),
+            Color.White.copy(alpha = 1.0f),
+            Color.White.copy(alpha = 0.5f),
+        )
+    )
 
     CompositionLocalProvider(
         LocalTypography provides AppTypography,
         LocalShapes provides Shapes(),
         LocalSpacing provides Spacing(),
-        LocalAppColorScheme provides colorScheme
+        LocalAppColorScheme provides colorScheme,
+        LocalShimmerTheme provides shimmerTheme
     ) {
         MaterialTheme(
             content = content,

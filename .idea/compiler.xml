@@ -2,7 +2,9 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <bytecodeTargetLevel target="11">
+      <module name="rcfh.core.account.test" target="21" />
       <module name="rcfh.core.navigation.test" target="21" />
+      <module name="rcfh.feature.templates.main" target="21" />
       <module name="rcfh.feature.templates.test" target="21" />
     </bytecodeTargetLevel>
   </component>

@@ -47,6 +47,12 @@ fun AppCheckbox(
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
+            .clickable(
+                enabled = enabled,
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+                onClick = { onCheckedChange(!checked) }
+            )
     ) {
         Box(
             contentAlignment = Alignment.Center,
@@ -57,12 +63,6 @@ fun AppCheckbox(
                     borderColor?.let {
                         Modifier.border(1.dp, it, shape)
                     } ?: Modifier
-                )
-                .clickable(
-                    enabled = enabled,
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null,
-                    onClick = { onCheckedChange(!checked) }
                 )
                 .padding(1.dp)
         ) {
@@ -78,7 +78,7 @@ fun AppCheckbox(
                     contentDescription = null,
                     tint = it,
                     modifier = Modifier
-                        .size(20.dp)
+                        .size(16.dp)
                         .thenIf(loading) { alpha(0f) }
                 )
             }

@@ -10,7 +10,4 @@ android.namespace = "ru.rcfh.core.datastore"
 dependencies {
     implementation(libs.datastore)
     implementation(projects.core.model)
-
-    implementation(libs.arrowkt.optionals)
-    ksp(libs.arrowkt.optionals.ksp)
 }

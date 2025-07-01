@@ -51,22 +51,22 @@ The root cause java.lang.RuntimeException was thrown at: org.jetbrains.kotlin.ba
 	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source)
 	at java.base/java.lang.Thread.run(Unknown Source)
 Caused by: java.lang.RuntimeException: Exception while generating code for:
-FUN name:ProvideStateStorage visibility:public modality:FINAL <> (cacheStorage:ru.rcfh.core.sdui.storage.StateCacheStorage, draftId:kotlin.String, content:@[Composable] kotlin.Function0<kotlin.Unit>) returnType:kotlin.Unit
+FUN name:ProvideStateStorage visibility:public modality:FINAL <> (cacheStorage:ru.rcfh.core.sdui.storage.StateCacheStorage, documentId:kotlin.String, content:@[Composable] kotlin.Function0<kotlin.Unit>) returnType:kotlin.Unit
   annotations:
     Composable
   VALUE_PARAMETER name:cacheStorage index:0 type:ru.rcfh.core.sdui.storage.StateCacheStorage
-  VALUE_PARAMETER name:draftId index:1 type:kotlin.String
+  VALUE_PARAMETER name:documentId index:1 type:kotlin.String
   VALUE_PARAMETER name:content index:2 type:@[Composable] kotlin.Function0<kotlin.Unit>
   BLOCK_BODY
     VAR name:storage type:ru.rcfh.core.sdui.storage.TypedStateStorage [val]
       CALL 'public final fun remember <T> (key1: kotlin.Any?, calculation: @[DisallowComposableCalls] kotlin.Function0<T of androidx.compose.runtime.ComposablesKt.remember>): T of androidx.compose.runtime.ComposablesKt.remember [inline] declared in androidx.compose.runtime.ComposablesKt' type=ru.rcfh.core.sdui.storage.TypedStateStorage origin=null
         <T>: ru.rcfh.core.sdui.storage.TypedStateStorage
-        key1: GET_VAR 'draftId: kotlin.String declared in ru.rcfh.core.sdui.compose.LocalStateCacheKt.ProvideStateStorage' type=kotlin.String origin=null
+        key1: GET_VAR 'documentId: kotlin.String declared in ru.rcfh.core.sdui.compose.LocalStateCacheKt.ProvideStateStorage' type=kotlin.String origin=null
         calculation: BLOCK type=kotlin.Function0<ru.rcfh.core.sdui.storage.TypedStateStorage> origin=LAMBDA
           COMPOSITE type=kotlin.Unit origin=null
-          FUNCTION_REFERENCE 'private final fun ProvideStateStorage$lambda$1 ($cacheStorage: ru.rcfh.core.sdui.storage.StateCacheStorage, $draftId: kotlin.String): ru.rcfh.core.sdui.storage.TypedStateStorage declared in ru.rcfh.core.sdui.compose.LocalStateCacheKt' type=kotlin.Function0<ru.rcfh.core.sdui.storage.TypedStateStorage> origin=INLINE_LAMBDA reflectionTarget=null
+          FUNCTION_REFERENCE 'private final fun ProvideStateStorage$lambda$1 ($cacheStorage: ru.rcfh.core.sdui.storage.StateCacheStorage, $documentId: kotlin.String): ru.rcfh.core.sdui.storage.TypedStateStorage declared in ru.rcfh.core.sdui.compose.LocalStateCacheKt' type=kotlin.Function0<ru.rcfh.core.sdui.storage.TypedStateStorage> origin=INLINE_LAMBDA reflectionTarget=null
             $cacheStorage: GET_VAR 'cacheStorage: ru.rcfh.core.sdui.storage.StateCacheStorage declared in ru.rcfh.core.sdui.compose.LocalStateCacheKt.ProvideStateStorage' type=ru.rcfh.core.sdui.storage.StateCacheStorage origin=null
-            $draftId: GET_VAR 'draftId: kotlin.String declared in ru.rcfh.core.sdui.compose.LocalStateCacheKt.ProvideStateStorage' type=kotlin.String origin=null
+            $documentId: GET_VAR 'documentId: kotlin.String declared in ru.rcfh.core.sdui.compose.LocalStateCacheKt.ProvideStateStorage' type=kotlin.String origin=null
     CALL 'public final fun CompositionLocalProvider (value: androidx.compose.runtime.ProvidedValue<*>, content: @[Composable] kotlin.Function0<kotlin.Unit>): kotlin.Unit declared in androidx.compose.runtime.CompositionLocalKt' type=kotlin.Unit origin=null
       value: CALL 'public final fun provides (value: T of androidx.compose.runtime.ProvidableCompositionLocal): androidx.compose.runtime.ProvidedValue<T of androidx.compose.runtime.ProvidableCompositionLocal> [infix] declared in androidx.compose.runtime.ProvidableCompositionLocal' type=androidx.compose.runtime.ProvidedValue<ru.rcfh.core.sdui.storage.TypedStateStorage> origin=null
         $this: GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:LocalStateCache type:androidx.compose.runtime.ProvidableCompositionLocal<ru.rcfh.core.sdui.storage.TypedStateStorage> visibility:private [final,static]' type=androidx.compose.runtime.ProvidableCompositionLocal<ru.rcfh.core.sdui.storage.TypedStateStorage> origin=null

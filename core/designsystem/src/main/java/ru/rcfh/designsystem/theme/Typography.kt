@@ -115,7 +115,7 @@ val AppTypography = Typography(
     ),
     calloutButton = TextStyle(
         fontFamily = FontFamily.SansSerif,
-        fontWeight = FontWeight.SemiBold,
+        fontWeight = FontWeight.Medium,
         fontSize = 16.sp,
         lineHeight = 20.sp,
         letterSpacing = 0.0025.em,

@@ -12,7 +12,7 @@ android {
     compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
-        applicationId = "ru.rcfh"
+        applicationId = "ru.rcfh.glpm"
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
         versionCode = 1
@@ -48,7 +48,6 @@ android {
         debug {
             isMinifyEnabled = false
             signingConfig = signingConfigs.getByName("release")
-
         }
     }
 }
@@ -60,16 +59,20 @@ dependencies {
     implementation(projects.core.data)
     implementation(projects.core.navigation)
     implementation(projects.core.sync)
+    implementation(projects.core.account)
     implementation(projects.core.sdui)
 
     // Feature modules
-    implementation(projects.feature.forms)
-    implementation(projects.feature.templates)
+    implementation(projects.feature.form)
     implementation(projects.feature.login)
+    implementation(projects.feature.documents)
+    implementation(projects.feature.home)
+    implementation(projects.feature.settings)
 
     // Core libs
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.splashScreen)
 
     // Koin
     implementation(libs.koin.compose)
