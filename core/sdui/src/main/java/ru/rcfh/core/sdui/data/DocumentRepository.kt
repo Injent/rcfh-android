@@ -1,12 +1,15 @@
 package ru.rcfh.core.sdui.data
 
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 import kotlinx.datetime.LocalDateTime
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.encodeToJsonElement
@@ -15,6 +18,8 @@ import pro.respawn.apiresult.onError
 import ru.rcfh.common.now
 import ru.rcfh.core.account.repository.AccountRepository
 import ru.rcfh.core.sdui.model.Document
+import ru.rcfh.core.sdui.model.ExportDocument
+import ru.rcfh.core.sdui.model.ExportForm
 import ru.rcfh.core.sdui.model.toExternalModel
 import ru.rcfh.core.sdui.template.DocumentOptions
 import ru.rcfh.core.sdui.template.FormOptions
@@ -22,6 +27,7 @@ import ru.rcfh.core.sdui.template.FormTab
 import ru.rcfh.database.dao.DocumentDao
 import ru.rcfh.database.dao.FormDao
 import ru.rcfh.database.entity.DocumentEntity
+import ru.rcfh.database.entity.FormEntity
 import timber.log.Timber
 
 class DocumentRepository(
@@ -106,7 +112,6 @@ class DocumentRepository(
         }
 
     suspend fun delete(documentId: Int) {
-        println(documentId)
         formDao.deleteByDocumentId(documentId)
         documentDao.delete(documentId)
     }
@@ -133,6 +138,52 @@ class DocumentRepository(
         .onError { e ->
             Timber.e(e)
         }
+
+    suspend fun export(documentId: Int): String? = withContext(Dispatchers.IO) {
+        val doc = documentDao.get(documentId) ?: return@withContext null
+        return@withContext format.encodeToString(
+            ExportDocument(
+                docId = documentId,
+                name = doc.name,
+                schemaVersion = 1,
+                options = doc.options,
+                data = formDao.getForms(documentId = documentId)
+                    .map { form ->
+                        ExportForm(
+                            formId = form.formId,
+                            state = form.state
+                        )
+                    }
+            )
+        )
+    }
+
+    suspend fun import(content: String): Int {
+        return withContext(Dispatchers.IO) {
+            val doc = format.decodeFromString<ExportDocument>(content)
+
+            documentDao.insert(
+                DocumentEntity(
+                    id = doc.docId,
+                    name = doc.name,
+                    modificationTimestamp = LocalDateTime.now(),
+                    ownerId = getUserIdOrThrow(),
+                    options = doc.options
+                )
+            )
+            formDao.insertAllOrReplace(
+                doc.data.map { form ->
+                    FormEntity(
+                        documentId = doc.docId,
+                        formId = form.formId,
+                        isValid = false,
+                        state = form.state
+                    )
+                }
+            )
+            doc.docId
+        }
+    }
 
     @Throws(IllegalStateException::class)
     private suspend fun getUserIdOrThrow(): Int {

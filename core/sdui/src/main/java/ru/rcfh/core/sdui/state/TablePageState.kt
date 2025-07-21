@@ -37,6 +37,10 @@ class TablePageState(
     override val mIndex: Int
         get() = rowIndex
 
+    fun getActive(): List<TextState> {
+        return if (useActual) actual else origin
+    }
+
     override fun updateIndex(index: Int) {
         rowIndex = index
         origin.forEach { it.updateIndex(index) }

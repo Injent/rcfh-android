@@ -7,18 +7,20 @@ fun Float.format(places: Int): String {
     return "%.${places}f".format(Locale.US, this)
 }
 
-fun evaluateDotProductFormula(productA: List<Float>, productB: List<Float>): String {
-    if (productA.size != productB.size) {
-        return "ERROR"
-    }
+fun evaluateDotProductFormula(a: List<Float?>, b: List<Float?>): Float {
+    require(a.size == b.size) { "Размеры массивов должны быть одинаковыми" }
 
-    val dotSum = productA.zip(productB).sumOf { (a, b) -> a * b.toDouble() }
-    return (dotSum / 10f).toFloat().format(2)
+    var sum = 0.0
+    for (i in a.indices) {
+        if (a[i] == null || b[i] == null) continue
+        sum += (a[i]!! * b[i]!!) / 10.0
+    }
+    return sum.toFloat()
 }
 
 fun evaluateSimpleFormula(formula: String, values: Map<String, Float>): Float {
     var processedFormula = formula
-    val varPattern = Regex("\\{(\\w+)\\}")
+    val varPattern = Regex("\\{(\\w*(?:\\$\\w*)?)\\}")
     processedFormula = varPattern.replace(processedFormula) { matchResult ->
         values[matchResult.groupValues[1]]?.toString() ?: "0"
     }

@@ -14,6 +14,7 @@ import kotlinx.coroutines.launch
 import ru.rcfh.core.sdui.data.DocumentStateManager
 import ru.rcfh.core.sdui.state.FieldState
 import ru.rcfh.core.sdui.state.TableState
+import ru.rcfh.navigation.Navigator
 import ru.rcfh.navigation.Screen
 
 class TableRecordUiState(
@@ -49,9 +50,9 @@ class TableRecordViewModel(
             initialValue = TableRecordUiState()
         )
 
-    fun save() {
+    fun onBack() {
         viewModelScope.launch {
-            documentStateManager.save()
+            Navigator.navigateUp()
         }
     }
 }

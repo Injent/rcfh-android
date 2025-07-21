@@ -10,24 +10,6 @@ val Form4 = FormTemplate(
     id = 4,
     name = "IV. Форма ввода ВНН за санитарным состоянием насаждений глазомерным методом",
     templates = listOf(
-        Template.Repeatable(
-            id = "prichiniPovrezhdeniya",
-            name = "Причины повреждения",
-            templates = listOf(
-                Template.Text(
-                    id = "prichina",
-                    label = "Причины повреждения",
-                    visual = Visual.Reference(handbookId = 10), // Справочник связи причины-признак (32) & Справочник кодов причин повреждения, ослабления и усыхания насаждений (10)
-                    rules = listOf(Rule.Required("Поле не заполнено"))
-                ),
-                Template.Text(
-                    id = "godpovr",
-                    label = "Год ослабления, повреждения насаждения",
-                    visual = Visual.Date(format = "yyyy"),
-                    rules = listOf(Rule.Required("Поле не заполнено"))
-                )
-            )
-        ),
         Template.Table(
             id = "4table",
             name = "Таблица 4 формы",
@@ -86,6 +68,16 @@ val Form4 = FormTemplate(
                     id = "sksnas",
                     label = "",
                     formula = "SUM({sksporoda}*{dolap})/10".toFormula()
+                ),
+                "ooporoda" to Template.Calculated(
+                    id = "oonas",
+                    label = "",
+                    formula = "SUM({ooporoda}*{dolap})/10".toFormula()
+                ),
+                "toporoda" to Template.Calculated(
+                    id = "tonas",
+                    label = "",
+                    formula = "SUM({toporoda}*{dolap})/10".toFormula()
                 )
             ),
             dependency = "species_specs",
@@ -246,6 +238,18 @@ val Form4 = FormTemplate(
                     formula = "{usdolap}+{svsuhdolap}+{svvtrdolap}+{svburdolap}".toFormula(),
                     unit = "%"
                 ),
+                Template.Text(
+                    id = "prichina",
+                    label = "Причины повреждения",
+                    visual = Visual.Reference(handbookId = 10),
+                    rules = listOf(Rule.Required("Поле не заполнено"))
+                ),
+                Template.Text(
+                    id = "godpovr",
+                    label = "Год ослабления, повреждения насаждения",
+                    visual = Visual.Date(format = "yyyy"),
+                    rules = listOf(Rule.Required("Поле не заполнено"))
+                ),
                 Template.Repeatable(
                     id = "4repeatable",
                     name = "Признаки повреждения по породам",
@@ -253,7 +257,7 @@ val Form4 = FormTemplate(
                         Template.Text(
                             id = "prizn",
                             label = "Признак",
-                            visual = Visual.Reference(handbookId = 10), // TODO
+                            visual = Visual.Reference(handbookId = 9, dependsOn = "prichina"),
                             rules = listOf(Rule.Required("Поле не заполнено"))
                         ),
                         Template.Text(

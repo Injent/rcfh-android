@@ -8,6 +8,7 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonPrimitive
 import ru.rcfh.core.sdui.common.DetectedError
 import ru.rcfh.core.sdui.common.IndexAware
+import ru.rcfh.core.sdui.common.PostInitListener
 import ru.rcfh.core.sdui.event.SetVariable
 
 class LinkedState(
@@ -16,7 +17,7 @@ class LinkedState(
     initialValue: String,
     rowIndex: Int,
     documentState: DocumentState
-) : FieldState(documentState), IndexAware {
+) : FieldState(documentState), IndexAware, PostInitListener {
     var rowIndex by mutableIntStateOf(rowIndex)
         private set
     var value by mutableStateOf(initialValue)
@@ -30,7 +31,7 @@ class LinkedState(
         }
     }
 
-    fun relink() {
+    override fun onInitialized() {
         document.findById<TextState>(
             templateId = id,
             rowIndex = rowIndex

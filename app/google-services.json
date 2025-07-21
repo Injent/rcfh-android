@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "170150096478",
+    "project_id": "rcfh-glpm",
+    "storage_bucket": "rcfh-glpm.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:170150096478:android:f77c69ca6b0aed94ca4ecf",
+        "android_client_info": {
+          "package_name": "ru.rcfh.glpm"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDXJeqY8vOTtJCKclnyrMhybgr9_qeyjmk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

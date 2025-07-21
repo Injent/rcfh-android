@@ -10,28 +10,6 @@ val Form5 = FormTemplate(
     id = 5,
     name = "V. Форма ввода ВНН за лесопатологическим состоянием насаждений глазомерным методом",
     templates = listOf(
-        Template.Repeatable(
-            id = "prichiniPovrezhdeniya2",
-            name = "Причины повреждения",
-            templates = listOf(
-                Template.Text(
-                    id = "prichina2",
-                    label = "Причины повреждения",
-                    visual = Visual.Reference(handbookId = 10), // TODO
-                    rules = listOf(
-                        Rule.Required("Поле не заполнено")
-                    )
-                ),
-                Template.Text(
-                    id = "godpovr2",
-                    label = "Год ослабления, повреждения насаждения",
-                    visual = Visual.Date(format = "yyyy"),
-                    rules = listOf(
-                        Rule.Required("Поле не заполнено")
-                    )
-                )
-            )
-        ),
         Template.Table(
             id = "table5",
             name = "Таблица",
@@ -109,7 +87,7 @@ val Form5 = FormTemplate(
                         ),
                         Template.Text(
                             id = "objedola25",
-                            label = "1 - 25%",
+                            label = "1-25%",
                             rules = listOf(
                                 Rule.DigitFormat(
                                     decimalSize = 3,
@@ -120,7 +98,7 @@ val Form5 = FormTemplate(
                         ),
                         Template.Text(
                             id = "objedola50",
-                            label = "26 – 50%",
+                            label = "26-50%",
                             rules = listOf(
                                 Rule.DigitFormat(
                                     decimalSize = 3,
@@ -131,7 +109,7 @@ val Form5 = FormTemplate(
                         ),
                         Template.Text(
                             id = "objedola75",
-                            label = "51 - 75%",
+                            label = "51-75%",
                             rules = listOf(
                                 Rule.DigitFormat(
                                     decimalSize = 3,
@@ -142,7 +120,7 @@ val Form5 = FormTemplate(
                         ),
                         Template.Text(
                             id = "objedola100",
-                            label = "75.1 - 100%",
+                            label = "75.1-100%",
                             rules = listOf(
                                 Rule.DigitFormat(
                                     decimalSize = 3,
@@ -158,6 +136,22 @@ val Form5 = FormTemplate(
                     label = "Доля поврежденных деревьев, % от количества",
                     formula = "{objedola25}+{objedola50}+{objedola75}+{objedola100}".toFormula()
                 ),
+                Template.Text(
+                    id = "prichina2",
+                    label = "Причины повреждения",
+                    visual = Visual.Reference(handbookId = 10),
+                    rules = listOf(
+                        Rule.Required("Поле не заполнено")
+                    )
+                ),
+                Template.Text(
+                    id = "godpovr2",
+                    label = "Год ослабления, повреждения насаждения",
+                    visual = Visual.Date(format = "yyyy"),
+                    rules = listOf(
+                        Rule.Required("Поле не заполнено")
+                    )
+                ),
                 Template.Repeatable(
                     id = "5repeatable2",
                     name = "Признаки повреждения по породам",
@@ -165,7 +159,7 @@ val Form5 = FormTemplate(
                         Template.Text(
                             id = "prizn2",
                             label = "Признак",
-                            visual = Visual.Reference(handbookId = 10), // TODO
+                            visual = Visual.Reference(handbookId = 9),
                             rules = listOf(Rule.Required("Поле не заполнено"))
                         ),
                         Template.Text(

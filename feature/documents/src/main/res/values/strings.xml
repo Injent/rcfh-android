@@ -26,6 +26,8 @@
     <string name="label_addAccount">Добавить аккаунт</string>
     <string name="subheadline_severeProblem">Серьезная ошибка</string>
     <string name="subheadline_warningProblem">Предупреждения</string>
+    <string name="info_fileSaved">Файл сохранен в загрузки</string>
+    <string name="button_open">Открыть</string>
     <plurals name="fields">
         <item quantity="zero">Нет полей</item>
         <item quantity="one">%1$d поле</item>

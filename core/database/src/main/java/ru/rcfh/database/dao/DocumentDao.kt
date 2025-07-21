@@ -20,6 +20,9 @@ interface DocumentDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(document: DocumentEntity): Long
 
+    @Query("SELECT * FROM documents WHERE id = :id LIMIT 1")
+    suspend fun get(id: Int): DocumentEntity?
+
     @Query("UPDATE documents SET name = :name WHERE id = :id")
     suspend fun updateName(id: Int, name: String)
 

@@ -1,10 +1,13 @@
 package ru.rcfh.feature.documents.presentation.list
 
+import android.content.Context
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
@@ -17,6 +20,8 @@ import ru.rcfh.core.account.repository.AccountRepository
 import ru.rcfh.core.sdui.data.DocumentRepository
 import ru.rcfh.core.sdui.model.Document
 import ru.rcfh.navigation.Navigator
+import java.io.BufferedReader
+import java.io.InputStreamReader
 
 sealed interface DocumentListEvent {
     data class DocumentCreated(val documentId: Int) : DocumentListEvent
@@ -33,6 +38,7 @@ class DocumentListViewModel(
     private val documentRepository: DocumentRepository,
     private val accountRepository: AccountRepository,
 ) : ViewModel() {
+    private var createJob: Job? = null
     private val _events = Channel<DocumentListEvent>()
     val events = _events.receiveAsFlow()
 
@@ -55,7 +61,8 @@ class DocumentListViewModel(
         )
 
     fun onCreateDocument(name: String) {
-        viewModelScope.launch {
+        createJob?.cancel()
+        createJob = viewModelScope.launch {
             documentRepository.create(
                 name.fetchDocumentName(uiState.value.documents.map(Document::name))
             )
@@ -68,6 +75,20 @@ class DocumentListViewModel(
     fun onChooseAccount(account: RcfhAccount) {
         viewModelScope.launch {
             accountRepository.choose(account)
+        }
+    }
+
+    fun importFile(context: Context, fileUri: Uri, onSave: (Int) -> Unit) {
+        viewModelScope.launch {
+            try {
+                context.contentResolver.openInputStream(fileUri)?.use { inputStream ->
+                    BufferedReader(InputStreamReader(inputStream)).use { reader ->
+                        onSave(documentRepository.import(reader.readText()))
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
     }
 

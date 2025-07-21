@@ -1,5 +1,6 @@
 package ru.rcfh.designsystem.component
 
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.FilledIconButton
@@ -8,6 +9,7 @@ import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
@@ -23,6 +25,7 @@ fun AppIconButton(
         AppTheme.colorScheme.background2
     } else AppTheme.colorScheme.background4,
     shape: Shape = AppTheme.shapes.default,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     enabled: Boolean = true
 ) {
     CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides 40.dp) {
@@ -33,6 +36,7 @@ fun AppIconButton(
                 containerColor = containerColor,
                 contentColor = icon.tint ?: AppTheme.colorScheme.foreground
             ),
+            interactionSource = interactionSource,
             enabled = enabled,
             modifier = modifier
                 .defaultMinSize(40.dp)

@@ -1,5 +1,6 @@
 package ru.rcfh.core.sdui.data
 
+import ru.rcfh.core.sdui.common.Format
 import ru.rcfh.core.sdui.common.Rule
 import ru.rcfh.core.sdui.common.Visual
 import ru.rcfh.core.sdui.common.toFormula
@@ -14,6 +15,28 @@ val Form6 = FormTemplate(
             id = "6table",
             name = "Сводка по состоянию насаждения",
             dependency = "species_specs",
+            total = mapOf(
+                "sksporoda" to Template.Calculated(
+                    id = "sksnas",
+                    label = "",
+                    formula = "SUM({sksporoda}*{dolap})/10".toFormula()
+                ),
+                "ooporoda" to Template.Calculated(
+                    id = "oonas",
+                    label = "",
+                    formula = "SUM({ooporoda}*{dolap})/10".toFormula()
+                ),
+                "toporoda" to Template.Calculated(
+                    id = "tonas",
+                    label = "",
+                    formula = "SUM({toporoda}*{dolap})/10".toFormula()
+                ),
+                "dolapovr" to Template.Calculated(
+                    id = "dolapovrn",
+                    label = "",
+                    formula = "SUM({dolapovr}*{dolap})/10".toFormula()
+                )
+            ),
             columns = listOf(
                 Template.Linked(
                     id = "yarus",
@@ -44,6 +67,16 @@ val Form6 = FormTemplate(
                     formula = "{usdolap}+{svsuhdolap}+{svvtrdolap}+{svburdolap}".toFormula(),
                     unit = "%"
                 ),
+                Template.Calculated(
+                    id = "dolapovr",
+                    label = "Доля поврежденных деревьев, % от количества",
+                    formula = "{objedola25}+{objedola50}+{objedola75}+{objedola100}".toFormula()
+                ),
+                Template.Calculated(
+                    id = "ostpolnota",
+                    label = "Расчетная остаточная полнота",
+                    formula = "{polnota}-(({polnota}*{\$oonas})/100)".toFormula()
+                )
             )
         ),
         Template.Repeatable(
@@ -61,7 +94,7 @@ val Form6 = FormTemplate(
                 Template.Text(
                     id = "ochagstep",
                     label = "Степень повреждения",
-                    visual = Visual.Reference(handbookId = 1), // TODO
+                    visual = Visual.Reference(handbookId = 35),
                     rules = listOf(
                         Rule.Required("Поле не заполнено")
                     )
@@ -96,6 +129,7 @@ val Form6 = FormTemplate(
                 Template.Text(
                     id = "srekmer",
                     label = "Площадь",
+                    format = Format.FullnessLimits(fieldId = "s", errorMsg = "Превышает площадь лесотаксационного выдела"),
                     rules = listOf(
                         Rule.DigitFormat(
                             decimalSize = 4,

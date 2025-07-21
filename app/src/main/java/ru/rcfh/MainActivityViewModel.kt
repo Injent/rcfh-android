@@ -21,6 +21,8 @@ class MainActivityViewModel(
     private val syncManager: SyncManager,
     settingsRepository: SettingsRepository,
 ) : ViewModel() {
+    private var syncRequested = false
+
     @OptIn(ExperimentalCoroutinesApi::class)
     val uiState = settingsRepository.data
         .mapLatest {
@@ -31,7 +33,9 @@ class MainActivityViewModel(
             )
         }
         .onStart {
-            syncManager.requestSync()
+            if (!syncRequested) {
+                syncManager.requestSync()
+            }
         }
         .stateIn(
             scope = viewModelScope,

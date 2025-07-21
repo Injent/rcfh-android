@@ -8,12 +8,12 @@ sealed interface Visual {
     @Serializable
     @SerialName("text")
     data class Text(
-        val multiline: Boolean = false
+        val multiline: Boolean = false,
     ) : Visual
 
     @Serializable
     @SerialName("decimal")
-    data class Decimal(val unit: String? = null) : Visual
+    data class Decimal(val unit: String? = null, val canSetPlus: Boolean = false) : Visual
 
     @Serializable
     @SerialName("number")
@@ -33,5 +33,5 @@ sealed interface Visual {
 
     @Serializable
     @SerialName("reference")
-    data class Reference(val handbookId: Int) : Visual
+    data class Reference(val handbookId: Int, val dependsOn: String? = null) : Visual
 }

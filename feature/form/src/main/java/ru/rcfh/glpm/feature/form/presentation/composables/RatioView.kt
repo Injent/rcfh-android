@@ -2,6 +2,8 @@ package ru.rcfh.glpm.feature.form.presentation.composables
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,21 +16,33 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.delay
 import ru.rcfh.core.sdui.common.Visual
 import ru.rcfh.core.sdui.state.RatioState
 import ru.rcfh.core.sdui.state.TextState
@@ -145,7 +159,9 @@ private fun RatioViewItem(
 ) {
     Column(
         modifier = modifier
+            .widthIn(min = 48.dp)
             .width(IntrinsicSize.Max)
+            .alpha(if (state.enabled) 1f else .5f)
     ) {
         Text(
             text = state.label.substringBefore('\n'),
@@ -157,42 +173,37 @@ private fun RatioViewItem(
         )
         when (state.visual) {
             is Visual.Decimal -> {
-                AppIconButton(
-                    icon = AppIcon(
-                        icon = AppIcons.Add,
-                        onClick = {
-                            state.value = ((state.value.toIntOrNull() ?: 0) + 1)
-                                .coerceAtMost(100).toString()
-                        },
-                        tint = AppTheme.colorScheme.foregroundOnBrand
-                    ),
+                AppAddButton(
+                    onClick = {
+                        if (!state.enabled) return@AppAddButton
+
+                        state.value = ((state.value.toIntOrNull() ?: 0) + 1)
+                            .coerceAtMost(100).toString()
+                    },
                     enabled = (state.value.toIntOrNull() ?: 0) < 100 && !maxLimitReached,
-                    containerColor = AppTheme.colorScheme.backgroundBrand,
+                    icon = AppIcons.Add,
                     shape = AppTheme.shapes.defaultTopCarved,
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(48.dp)
+                        .widthIn(max = 50.dp)
                 )
                 DecimalTextField(
                     state = state,
                     modifier = Modifier
+                        .widthIn(max = 50.dp)
                         .height(48.dp)
                 )
-                AppIconButton(
-                    icon = AppIcon(
-                        icon = AppIcons.Minus,
-                        onClick = {
-                            state.value = ((state.value.toIntOrNull() ?: 0) - 1)
-                                .coerceAtMost(100).toString()
-                        },
-                        tint = AppTheme.colorScheme.foregroundOnBrand
-                    ),
+                AppAddButton(
+                    onClick = {
+                        if (!state.enabled) return@AppAddButton
+
+                        state.value = ((state.value.toIntOrNull() ?: 0) - 1)
+                            .coerceAtMost(100).toString()
+                    },
                     enabled = (state.value.toIntOrNull() ?: 0) > 0 && !minLimitReached,
-                    containerColor = AppTheme.colorScheme.backgroundBrand,
+                    icon = AppIcons.Minus,
                     shape = AppTheme.shapes.defaultBottomCarved,
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(48.dp)
+                        .widthIn(max = 50.dp)
                 )
             }
             else -> Unit
@@ -205,14 +216,21 @@ private fun DecimalTextField(
     state: TextState,
     modifier: Modifier = Modifier,
 ) {
+    val focusManager = LocalFocusManager.current
+
     BasicTextField(
         value = state.value,
-        onValueChange = { state.value = it },
+        onValueChange = {},
         keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Decimal
+            keyboardType = KeyboardType.Decimal,
+            imeAction = ImeAction.Next
         ),
+        readOnly = true,
         textStyle = AppTheme.typography.body.copy(textAlign = TextAlign.Center),
         modifier = modifier,
+        keyboardActions = KeyboardActions {
+            focusManager.moveFocus(FocusDirection.Next)
+        },
         decorationBox = { textField ->
             Box(
                 contentAlignment = Alignment.Center,
@@ -229,5 +247,44 @@ private fun DecimalTextField(
                 textField()
             }
         }
+    )
+}
+
+@Composable
+fun AppAddButton(
+    onClick: () -> Unit,
+    icon: ImageVector,
+    enabled: Boolean,
+    shape: Shape,
+    modifier: Modifier = Modifier,
+) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+
+    LaunchedEffect(isPressed) {
+        if (!isPressed) {
+            currentCoroutineContext().cancel()
+        }
+        var step = 300L
+        while (isPressed) {
+            onClick()
+            step = (step - 50).coerceAtLeast(50)
+            delay(step)
+        }
+    }
+
+    AppIconButton(
+        icon = AppIcon(
+            icon = icon,
+            onClick = onClick,
+            tint = AppTheme.colorScheme.foregroundOnBrand
+        ),
+        enabled = enabled,
+        interactionSource = interactionSource,
+        containerColor = AppTheme.colorScheme.backgroundBrand,
+        shape = shape,
+        modifier = modifier
+            .fillMaxWidth()
+            .height(48.dp)
     )
 }

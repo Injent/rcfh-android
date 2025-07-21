@@ -9,57 +9,67 @@ val Form3 = FormTemplate(
     id = 3,
     name = "III. Форма ввода дополнительных сведений лесоустройства",
     templates = listOf(
-        Template.Text(
-            id = "sostavpod",
-            label = "Подрост. Состав",
-            visual = Visual.Text()
-        ),
-        Template.Text(
-            id = "vozrpod",
-            label = "Подрост. Средний возраст",
-            rules = listOf(
-                Rule.Required("Поле не заполнено"),
-                Rule.DigitFormat(
-                    decimalSize = 1,
-                    message = DIGIT_MESSAGE
-                )
-            ),
-            visual = Visual.Decimal(
-                unit = "лет"
+        Template.Repeatable(
+            id = "podrost",
+            maxEntries = 1,
+            name = "Подрост",
+            templates = listOf(
+                Template.Text(
+                    id = "sostavpod",
+                    label = "Состав",
+                    visual = Visual.Text(),
+                    rules = listOf(
+                        Rule.Required("Поле не заполнено"),
+                    )
+                ),
+                Template.Text(
+                    id = "vozrpod",
+                    label = "Средний возраст",
+                    rules = listOf(
+                        Rule.Required("Поле не заполнено"),
+                        Rule.DigitFormat(
+                            decimalSize = 3,
+                            message = DIGIT_MESSAGE
+                        )
+                    ),
+                    visual = Visual.Decimal(
+                        unit = "лет"
+                    )
+                ),
+                Template.Text(
+                    id = "hpod",
+                    label = "Средняя высота",
+                    rules = listOf(
+                        Rule.DigitFormat(
+                            decimalSize = 2,
+                            precise = 1,
+                            message = DIGIT_MESSAGE
+                        )
+                    ),
+                    visual = Visual.Number(
+                        unit = "м"
+                    )
+                ),
+                Template.Text(
+                    id = "gustpod",
+                    label = "Густота",
+                    rules = listOf(
+                        Rule.DigitFormat(
+                            decimalSize = 3,
+                            precise = 2,
+                            message = DIGIT_MESSAGE
+                        )
+                    ),
+                    visual = Visual.Number(
+                        unit = "тыс. шт./ га"
+                    )
+                ),
+                Template.Text(
+                    id = "sostpod",
+                    label = "Состояние",
+                    visual = Visual.Reference(handbookId = 23),
+                ),
             )
-        ),
-        Template.Text(
-            id = "hpod",
-            label = "Подрост. Средняя высота",
-            rules = listOf(
-                Rule.DigitFormat(
-                    decimalSize = 2,
-                    precise = 1,
-                    message = DIGIT_MESSAGE
-                )
-            ),
-            visual = Visual.Number(
-                unit = "м"
-            )
-        ),
-        Template.Text(
-            id = "gustpod",
-            label = "Подрост. Густота",
-            rules = listOf(
-                Rule.DigitFormat(
-                    decimalSize = 3,
-                    precise = 2,
-                    message = DIGIT_MESSAGE
-                )
-            ),
-            visual = Visual.Number(
-                unit = "тыс. шт./ га"
-            )
-        ),
-        Template.Text(
-            id = "sostpod",
-            label = "Подрост. Состояние",
-            visual = Visual.Reference(handbookId = 23)
         ),
         Template.Text(
             id = "sostavpdl",
@@ -69,7 +79,7 @@ val Form3 = FormTemplate(
         Template.Text(
             id = "gustpdl",
             label = "Подлесок. Густота",
-            visual = Visual.Reference(handbookId = 1) // TODO Справочник густоты подлеска
+            visual = Visual.Text()
         ),
         Template.Text(
             id = "hpdl",
@@ -88,7 +98,7 @@ val Form3 = FormTemplate(
         Template.Text(
             id = "sostpdl",
             label = "Подлесок. Состояние",
-            visual = Visual.Reference(handbookId = 1) // TODO Справочник состояния подлеска
+            visual = Visual.Text()
         ),
         Template.Text(
             id = "reljeff",
@@ -124,7 +134,7 @@ val Form3 = FormTemplate(
         Template.Text(
             id = "provlhm",
             label = "Проведенные хозяйственные мероприятия",
-            visual = Visual.Reference(handbookId = 1) // TODO Справочник лесохозяйственных мероприятий
+            visual = Visual.Reference(handbookId = 32)
         ),
         Template.Text(
             id = "itaks3",

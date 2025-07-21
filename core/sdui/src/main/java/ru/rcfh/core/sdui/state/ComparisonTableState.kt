@@ -55,9 +55,7 @@ class ComparisonTableState(
     }
 
     override fun items(): List<FieldState> {
-        return pages.flatMap { page ->
-            if (page.useActual) page.actual else page.origin
-        }
+        return pages.flatMap { page -> page.getActive() }
     }
 
     override fun detectErrors(): List<DetectedError> {

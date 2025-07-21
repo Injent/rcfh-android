@@ -137,16 +137,20 @@ fun AppSecondaryLargeButton(
 fun AppSmallButton(
     text: String,
     onClick: () -> Unit,
+    modifier: Modifier = Modifier,
     shape: Shape = CircleShape,
-    modifier: Modifier = Modifier
+    enabled: Boolean = true
 ) {
     Button(
         onClick = onClick,
         shape = shape,
         colors = ButtonDefaults.filledTonalButtonColors(
             containerColor = AppTheme.colorScheme.backgroundBrand,
-            contentColor = AppTheme.colorScheme.foregroundOnBrand
+            contentColor = AppTheme.colorScheme.foregroundOnBrand,
+            disabledContainerColor = AppTheme.colorScheme.backgroundDisabled,
+            disabledContentColor = AppTheme.colorScheme.foreground2
         ),
+        enabled = enabled,
         modifier = modifier
     ) {
         Text(

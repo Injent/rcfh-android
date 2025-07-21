@@ -1,7 +1,6 @@
 package ru.rcfh.data.repository
 
 import kotlinx.coroutines.flow.first
-import pro.respawn.apiresult.onError
 import pro.respawn.apiresult.orElse
 import ru.rcfh.data.model.Reference
 import ru.rcfh.data.model.mapper.toEntity
@@ -25,9 +24,12 @@ class HandbookRepository(
         val handbookCollection = service.getHandbookCollection()
             .orElse { return false }
 
-        if (localVersion == handbookCollection.version) return true
+        // TODO расскомментировать когда Миша добавит version
+        //if (localVersion == handbookCollection.version) return true
 
         handbookDao.clear()
+        referenceDao.clear()
+
         val handbookEntities = handbookCollection.handbooks
             .map(NetworkHandbookCollection.Handbook::toEntity)
         val referenceEntities = handbookCollection.handbooks
@@ -44,8 +46,39 @@ class HandbookRepository(
         return true
     }
 
-    suspend fun search(handbookId: Int, query: String): List<Reference> {
-        return referenceDao.search(handbookId = handbookId, query = query)
+    suspend fun search(
+        handbookId: Int,
+        query: String,
+        dependencyHandbook: Int? = null,
+        dependencyRefId: Int? = null
+    ): List<Reference> {
+        val codes = if (dependencyHandbook != null && dependencyRefId != null) {
+            referenceDao.getReference(
+                handbookId = dependencyHandbook,
+                id = dependencyRefId
+            )?.signCodes
+        } else null
+
+        return if (query.isBlank()) {
+            if (codes == null) {
+                referenceDao.getRefs(handbookId = handbookId)
+            } else {
+                referenceDao.getRefs(handbookId = handbookId, codes = codes)
+            }
+        } else {
+            referenceDao.search(
+                handbookId = handbookId,
+                query = query.toFtsQuery(),
+                codes = codes
+            )
+                .sortedByDescending { it.rank }
+                .map { it.reference }
+        }
             .map(ReferenceEntity::toExternalModel)
     }
+}
+
+fun String.toFtsQuery(): String {
+    val replacedQuery = replace("\"", "\"\"")
+    return "\"$replacedQuery*\""
 }

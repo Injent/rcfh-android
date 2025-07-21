@@ -27,6 +27,8 @@
     <string name="info_pageDeleted">Запись №%d удалена</string>
     <string name="dialog_delete_dismiss">Отмена</string>
     <string name="info_startTyping">Начните печатать</string>
+    <string name="info_dependencyReferenceNotFilled">Сначала укажите причину</string>
     <string name="info_tableIsEmpty">Таблица пуста</string>
     <string name="info_selectForm">Выбрать форму %s?</string>
+    <string name="info_allFormDataWillBeLost">Данные предыдущей формы будут удалены навсегда!</string>
 </resources>

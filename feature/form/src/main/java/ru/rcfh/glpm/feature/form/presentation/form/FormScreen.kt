@@ -316,7 +316,13 @@ private fun FormSelectableItems(
                         style = AppTheme.typography.headline1,
                         color = AppTheme.colorScheme.foreground1
                     )
-                    Spacer(Modifier.height(40.dp))
+                    Spacer(Modifier.height(AppTheme.spacing.l))
+                    Text(
+                        text = stringResource(R.string.info_allFormDataWillBeLost),
+                        style = AppTheme.typography.callout,
+                        color = AppTheme.colorScheme.foreground1
+                    )
+                    Spacer(Modifier.height(AppTheme.spacing.l))
                     Row(
                         horizontalArrangement = Arrangement.End,
                         modifier = Modifier

@@ -54,8 +54,8 @@ class DocumentStateManager(
         }
     }
 
-    suspend fun detectErrors(): ErrorReport = withContext(Dispatchers.Default) {
-        val docId = document?.documentId ?: return@withContext ErrorReport()
+    suspend fun detectErrors(): ErrorReport? = withContext(Dispatchers.Default) {
+        val docId = document?.documentId ?: return@withContext null
         val formElements = formRepo.getDocumentTemplate().forms
 
         val errors = formElements.flatMap { element ->
@@ -110,7 +110,6 @@ class DocumentStateManager(
                 )
             )
         }
-        println("SAVED")
     }
 
     fun closeUnsaved() {

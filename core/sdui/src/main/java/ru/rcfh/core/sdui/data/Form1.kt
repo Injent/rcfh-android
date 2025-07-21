@@ -1,5 +1,6 @@
 package ru.rcfh.core.sdui.data
 
+import ru.rcfh.core.sdui.common.Format
 import ru.rcfh.core.sdui.common.Rule
 import ru.rcfh.core.sdui.common.Visual
 import ru.rcfh.core.sdui.template.FormTemplate
@@ -70,7 +71,7 @@ val Form1 = FormTemplate(
         Template.Text(
             id = "lvo",
             label = "Лесничество",
-            visual = Visual.Reference(handbookId = 1),
+            visual = Visual.Reference(handbookId = 36),
             rules = listOf(
                 Rule.Required("Лесничество не выбрано")
             )
@@ -78,7 +79,7 @@ val Form1 = FormTemplate(
         Template.Text(
             id = "ulvo",
             label = "Уч. лесничество",
-            visual = Visual.Reference(handbookId = 1),
+            visual = Visual.Reference(handbookId = 36),
             rules = listOf(
                 Rule.Required("Участок не выбран")
             )
@@ -86,7 +87,7 @@ val Form1 = FormTemplate(
         Template.Text(
             id = "urc",
             label = "Урочище (лесная дача и т.п.)",
-            visual = Visual.Reference(handbookId = 1),
+            visual = Visual.Reference(handbookId = 36),
             rules = listOf(
                 Rule.Required("Урочище не выбрано")
             )
@@ -128,6 +129,7 @@ val Form1 = FormTemplate(
         Template.Text(
             id = "slp",
             label = "Площадь лесотаксационного выдела или лесопатологического выдела (при его выделении)",
+            format = Format.FullnessLimits(fieldId = "s", errorMsg = "Превышает площадь лесотаксационного выдела"),
             visual = Visual.Number(unit = "га"),
             rules = listOf(
                 Rule.Required("Поле не заполнено"),
@@ -141,6 +143,7 @@ val Form1 = FormTemplate(
         Template.Text(
             id = "kadnomer",
             label = "Кадастровый номер участка",
+            format = Format.CadastralNumber,
             visual = Visual.Text()
         ),
         Template.Text(

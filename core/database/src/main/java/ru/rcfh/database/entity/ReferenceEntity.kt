@@ -4,10 +4,9 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
-import androidx.room.PrimaryKey
 
 @Entity(
-    "references",
+    "refs",
     foreignKeys = [
         ForeignKey(
             entity = HandbookEntity::class,
@@ -24,6 +23,12 @@ data class ReferenceEntity(
     val id: Int,
     @ColumnInfo("name")
     val name: String,
+    @ColumnInfo("description")
+    val description: String? = null,
+    @ColumnInfo("code")
+    val code: Int? = null,
+    @ColumnInfo("sign_codes")
+    val signCodes: List<Int>? = null,
     @ColumnInfo("handbook_id")
-    val handbookId: Int
+    val handbookId: Int,
 )

@@ -1,6 +1,10 @@
 package ru.rcfh.core.sdui.state
 
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.toMutableStateList
 import kotlinx.serialization.json.JsonElement
@@ -16,14 +20,17 @@ class RepeatableState(
     override val id: String,
     val name: String,
     private val emptyTemplate: () -> SnapshotStateList<FieldState>,
+    val maxEntries: Int,
     documentState: DocumentState,
     initialValue: List<List<FieldState>> = emptyList(),
 ) : FieldState(documentState), IndexAware, Container {
-    val groups = IndexAwareStateList(
-        initialValue.map {
-            IndexAwareStateList(it.toMutableStateList())
-        }.toMutableStateList()
-    )
+    var enabled by mutableStateOf(true)
+    val groups = initialValue.map {
+        IndexAwareStateList(it.toMutableStateList())
+    }.toMutableStateList()
+    val canAddGroups by derivedStateOf {
+        groups.size < maxEntries
+    }
 
     fun addGroup() {
         groups.add(IndexAwareStateList(emptyTemplate()))

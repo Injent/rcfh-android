@@ -12,6 +12,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
 import ru.rcfh.core.sdui.common.IndexAware
+import ru.rcfh.core.sdui.common.PostInitListener
 import ru.rcfh.core.sdui.template.FormId
 import ru.rcfh.core.sdui.template.FormTemplate
 import kotlin.reflect.KClass
@@ -22,6 +23,8 @@ class DocumentState(
     formTemplates: List<FormTemplate>,
     formsContent: Map<FormId, JsonObject>
 ) {
+    var initialized = false
+        private set
     private val events = MutableSharedFlow<Any>(replay = 100, onBufferOverflow = BufferOverflow.DROP_OLDEST)
 
     val forms: SnapshotStateMap<FormId, FormState> =
@@ -32,12 +35,14 @@ class DocumentState(
         )
 
     init {
+        initialized = true
         forms.forEach { (_, formState) ->
-            formState.fields.forEach { it.deepRelink() }
+            formState.fields.forEach { it.notifyAboutInitialization() }
         }
     }
 
     inline fun <reified T : FieldState> findById(templateId: String, rowIndex: Int = -1): T? {
+        if (!initialized) return null
         // Top level
         for (formState in forms.values) {
             formState.fields.find(templateId, rowIndex, type = T::class)
@@ -65,6 +70,7 @@ class DocumentState(
     }
 
     fun postEvent(event: Any) {
+        if (!initialized) return
         documentScope.launch {
             events.emit(event)
         }
@@ -151,19 +157,19 @@ private fun createFormsStates(
                     .toImmutableList()
             )
         }
-
     return mutableStateMapOf<FormId, FormState>().apply { putAll(data) }
 }
 
-fun FieldState.deepRelink() {
+fun FieldState.notifyAboutInitialization() {
     when (this) {
         is Container -> {
             items().forEach {
-                it.deepRelink()
+                it.notifyAboutInitialization()
             }
         }
-        is LinkedState -> this.relink()
-        is CalculatedState -> this.calculate()
+        is PostInitListener -> {
+            onInitialized()
+        }
         else -> Unit
     }
 }

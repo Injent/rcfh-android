@@ -18,14 +18,20 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.InputTransformation
 import androidx.compose.foundation.text.input.KeyboardActionHandler
+import androidx.compose.foundation.text.input.OutputTransformation
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDefaults
+import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,23 +41,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.maxkeppeker.sheets.core.models.base.UseCaseState
-import com.maxkeppeker.sheets.core.models.base.rememberUseCaseState
-import com.maxkeppeler.sheets.calendar.CalendarDialog
-import com.maxkeppeler.sheets.calendar.models.CalendarConfig
-import com.maxkeppeler.sheets.calendar.models.CalendarSelection
-import com.maxkeppeler.sheets.calendar.models.CalendarStyle
+import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
 import kotlinx.datetime.format.FormatStringsInDatetimeFormats
 import kotlinx.datetime.format.byUnicodePattern
-import kotlinx.datetime.toKotlinLocalDate
+import kotlinx.datetime.toLocalDateTime
 import ru.rcfh.designsystem.icon.AppIcons
 import ru.rcfh.designsystem.icon.Calendar
 import ru.rcfh.designsystem.icon.Handbook
@@ -65,6 +69,7 @@ fun ReferenceTextField(
     placeholder: String = "",
     error: String? = null,
     label: String? = null,
+    enabled: Boolean = true,
     onCard: Boolean = false,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
@@ -91,16 +96,20 @@ fun ReferenceTextField(
                     AppIconButton(
                         icon = AppIcon(
                             icon = AppIcons.Handbook,
-                            onClick = onClick,
+                            onClick = {
+                                if (enabled) onClick()
+                            },
                         )
                     )
                 }
             )
         },
         modifier = modifier
+            .alpha(if (enabled) 1f else 0.5f)
             .clickable(
                 interactionSource = interactionSource,
                 indication = null,
+                enabled = enabled,
                 onClick = onClick
             )
             .onFocusChanged { state ->
@@ -128,16 +137,7 @@ fun DateTextField(
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isFocused by interactionSource.collectIsFocusedAsState()
-    val calendarState = rememberUseCaseState()
-    var yearPickerDialogOpen by remember { mutableStateOf(false) }
-
-    fun openDialog() {
-        if (format == YEAR_FORMAT) {
-            yearPickerDialogOpen = true
-        } else {
-            calendarState.show()
-        }
-    }
+    var dialogOpen by remember { mutableStateOf(false) }
 
     BasicTextField(
         value = value,
@@ -157,7 +157,7 @@ fun DateTextField(
                     AppIconButton(
                         icon = AppIcon(
                             icon = AppIcons.Calendar,
-                            onClick = ::openDialog,
+                            onClick = { dialogOpen = true },
                         )
                     )
                 },
@@ -165,38 +165,41 @@ fun DateTextField(
                 isEmpty = value.isEmpty(),
                 modifier = Modifier
                     .clickable {
-                        if (!readOnly) openDialog()
+                        if (!readOnly) {
+                            dialogOpen = true
+                        }
                     }
             )
         },
         modifier = modifier
             .onFocusChanged { focusState ->
                 if (focusState.isFocused && !readOnly) {
-                    openDialog()
+                    dialogOpen = true
                 }
             }
             .focusable()
     )
 
-    if (format.equals(YEAR_FORMAT, ignoreCase = true) && yearPickerDialogOpen) {
-        YearPickerDialog(
-            onSelect = { year ->
-                onValueChange(year.toString())
-                yearPickerDialogOpen = false
-            },
-            onDismiss = {
-                yearPickerDialogOpen = false
-            }
-        )
-    } else {
-        AppCalendarDialog(
-            state = calendarState,
-            format = format,
-            onSelectDate = { date ->
-                onValueChange(date.format(LocalDate.Format { byUnicodePattern(format) }))
-                calendarState.finish()
-            }
-        )
+    if (dialogOpen) {
+        if (format.equals(YEAR_FORMAT, ignoreCase = true)) {
+            YearPickerDialog(
+                onSelect = { year ->
+                    onValueChange(year.toString())
+                    dialogOpen = false
+                },
+                onDismiss = {
+                    dialogOpen = false
+                }
+            )
+        } else {
+            AppCalendarDialog(
+                onDismissRequest = { dialogOpen = false },
+                onSelectDate = { date ->
+                    onValueChange(date.format(LocalDate.Format { byUnicodePattern(format) }))
+                    dialogOpen = false
+                }
+            )
+        }
     }
 }
 
@@ -263,18 +266,82 @@ fun AppTextField(
 
 @Composable
 fun AppTextField(
+    value: TextFieldValue,
+    onValueChange: (TextFieldValue) -> Unit,
+    modifier: Modifier = Modifier,
+    placeholder: String = "",
+    inputTransformation: (String) -> Boolean = { true },
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
+    lineLimits: TextFieldLineLimits = TextFieldLineLimits.SingleLine,
+    leadingIcon: (@Composable () -> Unit)? = null,
+    trailingIcon: @Composable () -> Unit = {},
+    onCard: Boolean = false,
+    label: String? = null,
+    error: String? = null,
+    readOnly: Boolean = false,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    button: @Composable (() -> Unit)? = null,
+) {
+    val isFocused by interactionSource.collectIsFocusedAsState()
+
+    BasicTextField(
+        value = value,
+        onValueChange = {
+            if (inputTransformation(it.text)) {
+                onValueChange(it)
+            }
+        },
+        interactionSource = interactionSource,
+        keyboardOptions = keyboardOptions,
+        keyboardActions = keyboardActions,
+        textStyle = AppTheme.typography.body.copy(color = AppTheme.colorScheme.foreground1),
+        minLines = when (lineLimits) {
+            is TextFieldLineLimits.MultiLine -> lineLimits.minHeightInLines
+            TextFieldLineLimits.SingleLine -> 1
+        },
+        maxLines = when (lineLimits) {
+            is TextFieldLineLimits.MultiLine -> lineLimits.maxHeightInLines
+            TextFieldLineLimits.SingleLine -> 1
+        },
+        readOnly = readOnly,
+        visualTransformation = VisualTransformation.None,
+        decorationBox = { innerTextField ->
+            TextFieldDecorator(
+                innerTextField = innerTextField,
+                label = label,
+                trailingIcon = trailingIcon,
+                isFocused = isFocused,
+                leadingIcon = leadingIcon,
+                onCard = onCard,
+                placeholder = placeholder,
+                lineLimits = lineLimits,
+                isEmpty = value.text.isEmpty(),
+                button = button,
+                error = error,
+            )
+        },
+        modifier = modifier
+    )
+}
+
+@Composable
+fun AppTextField(
     state: TextFieldState,
     modifier: Modifier = Modifier,
     placeholder: String = "",
     error: String? = null,
     inputTransformation: InputTransformation? = null,
+    outputTransformation: OutputTransformation? = null,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     onKeyboardAction: KeyboardActionHandler? = null,
     lineLimits: TextFieldLineLimits = TextFieldLineLimits.SingleLine,
     leadingIcon: (@Composable () -> Unit)? = null,
     trailingIcon: @Composable () -> Unit = {},
     onCard: Boolean = false,
+    readOnly: Boolean = false,
     label: String? = null,
+    button: (@Composable () -> Unit)? = null,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
 ) {
     val isFocused by interactionSource.collectIsFocusedAsState()
@@ -284,6 +351,7 @@ fun AppTextField(
         interactionSource = interactionSource,
         keyboardOptions = keyboardOptions,
         onKeyboardAction = onKeyboardAction,
+        outputTransformation = outputTransformation,
         decorator = { innerTextField ->
             TextFieldDecorator(
                 innerTextField = innerTextField,
@@ -294,10 +362,12 @@ fun AppTextField(
                 onCard = onCard,
                 lineLimits = lineLimits,
                 placeholder = placeholder,
+                button = button,
                 isEmpty = state.text.isEmpty(),
                 error = error
             )
         },
+        readOnly = readOnly,
         textStyle = AppTheme.typography.body.copy(color = AppTheme.colorScheme.foreground1),
         inputTransformation = inputTransformation,
         lineLimits = lineLimits,
@@ -494,13 +564,13 @@ private fun TextFieldDecorator(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun AppCalendarDialog(
-    state: UseCaseState,
-    format: String,
+    onDismissRequest: () -> Unit,
     onSelectDate: (LocalDate) -> Unit,
 ) {
     MaterialTheme(
         colorScheme = MaterialTheme.colorScheme.copy(
             surface = AppTheme.colorScheme.background1,
+            background = AppTheme.colorScheme.background1,
             onSurface = AppTheme.colorScheme.foreground1,
             primary = AppTheme.colorScheme.foreground,
             onPrimary = AppTheme.colorScheme.foregroundOnBrand,
@@ -508,18 +578,39 @@ private fun AppCalendarDialog(
             surfaceVariant = AppTheme.colorScheme.background4
         )
     ) {
-        CalendarDialog(
-            state = state,
-            selection = CalendarSelection.Date(
-                selectedDate = java.time.LocalDate.now(),
-                onSelectDate = {
-                    onSelectDate(it.toKotlinLocalDate())
-                }
+        val state = rememberDatePickerState()
+        val confirmButtonEnabled by remember {
+            derivedStateOf { state.selectedDateMillis != null }
+        }
+
+        DatePickerDialog(
+            onDismissRequest = onDismissRequest,
+            colors = DatePickerDefaults.colors(
+                containerColor = AppTheme.colorScheme.background1,
+
             ),
-            config = CalendarConfig(
-                yearSelection = format.lowercase() == "yyyy",
-                style = CalendarStyle.MONTH,
-            ),
-        )
+            confirmButton = {
+                AppSmallButton(
+                    text = stringResource(android.R.string.ok),
+                    onClick = {
+                        state.selectedDateMillis?.let { dateMillis ->
+                            Instant
+                                .fromEpochMilliseconds(dateMillis)
+                                .toLocalDateTime(TimeZone.currentSystemDefault())
+                                .let { onSelectDate(it.date) }
+                        }
+                    },
+                    enabled = confirmButtonEnabled
+                )
+            },
+            dismissButton = {
+                AppTextButton(
+                    text = stringResource(android.R.string.cancel),
+                    onClick = onDismissRequest
+                )
+            }
+        ) {
+            DatePicker(state = state)
+        }
     }
 }

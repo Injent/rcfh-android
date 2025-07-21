@@ -1,5 +1,10 @@
 package ru.rcfh.feature.documents.presentation.list
 
+import android.app.Activity
+import android.content.Intent
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -48,8 +53,11 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.datetime.toJavaLocalDateTime
 import ru.rcfh.core.sdui.model.Document
+import ru.rcfh.designsystem.component.AppIcon
+import ru.rcfh.designsystem.component.AppIconButton
 import ru.rcfh.designsystem.component.AppSnackbarHost
 import ru.rcfh.designsystem.component.AppTextButton
+import ru.rcfh.designsystem.icon.Add
 import ru.rcfh.designsystem.icon.AppIcons
 import ru.rcfh.designsystem.icon.Menu
 import ru.rcfh.designsystem.icon.StatusError
@@ -67,6 +75,8 @@ internal fun DocumentListRoute(
     onSelectDocument: (Int) -> Unit,
     onMenuClick: () -> Unit
 ) {
+    val context = LocalContext.current
+
     ListenEvents(viewModel.events) { event ->
         when (event) {
             is DocumentListEvent.DocumentCreated -> onSelectDocument(event.documentId)
@@ -79,7 +89,14 @@ internal fun DocumentListRoute(
         onCreateDocument = viewModel::onCreateDocument,
         onBack = viewModel::back,
         onMenuClick = onMenuClick,
-        uiState = uiState
+        uiState = uiState,
+        onImport = { uri ->
+            viewModel.importFile(
+                context = context,
+                fileUri = uri,
+                onSave = onSelectDocument
+            )
+        }
     )
 }
 
@@ -90,9 +107,20 @@ private fun DocumentListScreen(
     onCreateDocument: (name: String) -> Unit,
     onBack: () -> Unit,
     onMenuClick: () -> Unit,
+    onImport: (Uri) -> Unit,
     uiState: DocumentListUiState
 ) {
     val context = LocalContext.current
+
+    val activityResultLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            result.data?.data?.let { uri ->
+                onImport(uri)
+            }
+        }
+    }
 
     Scaffold(
         contentWindowInsets = WindowInsets(0),
@@ -133,6 +161,20 @@ private fun DocumentListScreen(
                 )
 
                 Spacer(Modifier.weight(1f))
+
+                AppIconButton(
+                    icon = AppIcon(
+                        icon = AppIcons.Add,
+                        onClick = {
+                            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                                addCategory(Intent.CATEGORY_OPENABLE)
+                                type = "application/json"
+                            }
+                            activityResultLauncher.launch(intent)
+                        },
+                        tint = AppTheme.colorScheme.foreground1
+                    )
+                )
 
                 AppTextButton(
                     text = stringResource(R.string.button_createDocument),

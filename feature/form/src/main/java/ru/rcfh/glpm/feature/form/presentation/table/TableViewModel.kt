@@ -33,6 +33,12 @@ class TableViewModel(
             initialValue = null
         )
 
+    fun onBack() {
+        viewModelScope.launch {
+            Navigator.navigateUp()
+        }
+    }
+
     fun onEditRow(rowIdx: Int) {
         viewModelScope.launch {
             Navigator.navigate(

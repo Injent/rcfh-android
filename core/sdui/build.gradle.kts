@@ -11,6 +11,7 @@ dependencies {
     implementation(libs.compose.runtime)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.gms.location)
+    implementation(libs.androidx.altitude)
     implementation(projects.core.account)
     implementation(projects.core.common)
     implementation(projects.core.datastore)

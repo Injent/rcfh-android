@@ -9,12 +9,16 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.int
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import ru.rcfh.core.sdui.common.ComputeMetadata
+import ru.rcfh.core.sdui.common.Format
 import ru.rcfh.core.sdui.common.Formula
+import ru.rcfh.core.sdui.common.RefDependency
 import ru.rcfh.core.sdui.common.Rule
 import ru.rcfh.core.sdui.common.Visual
 import ru.rcfh.core.sdui.state.CalculatedState
@@ -36,7 +40,8 @@ sealed interface Template {
     fun restore(
         documentState: DocumentState,
         json: JsonElement = JsonNull,
-        rowIndex: Int = -1
+        rowIndex: Int = -1,
+        param: Any? = null
     ): FieldState
 
     @Serializable
@@ -46,12 +51,14 @@ sealed interface Template {
         val label: String,
         val visual: Visual,
         val hint: String? = null,
+        val format: Format = Format.None,
         val rules: List<Rule> = emptyList()
     ) : Template {
         override fun restore(
             documentState: DocumentState,
             json: JsonElement,
-            rowIndex: Int
+            rowIndex: Int,
+            param: Any?
         ): FieldState {
             return TextState(
                 id = id,
@@ -65,8 +72,24 @@ sealed interface Template {
                 }.getOrDefault(
                     if (visual is Visual.Checkbox) "false" else ""
                 ),
-                rowIndex = rowIndex
-            )
+                rowIndex = rowIndex,
+                metadata = param as? ComputeMetadata,
+                format = format
+            ).apply {
+                if (visual is Visual.Reference) {
+                    runCatching {
+                        with(json.jsonObject) {
+                            this@apply.setReference(
+                                refDependency = RefDependency(
+                                    handbookId = get("handbookId")!!.jsonPrimitive.int,
+                                    refId = get("refId")!!.jsonPrimitive.int
+                                ),
+                                value = get("value")!!.jsonPrimitive.content
+                            )
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -79,7 +102,8 @@ sealed interface Template {
         override fun restore(
             documentState: DocumentState,
             json: JsonElement,
-            rowIndex: Int
+            rowIndex: Int,
+            param: Any?
         ): FieldState {
             return LinkedState(
                 id = id,
@@ -102,7 +126,8 @@ sealed interface Template {
         override fun restore(
             documentState: DocumentState,
             json: JsonElement,
-            rowIndex: Int
+            rowIndex: Int,
+            param: Any?
         ): FieldState {
             return RatioState(
                 id = id,
@@ -110,7 +135,11 @@ sealed interface Template {
                     templates.map { template ->
                         template.restore(
                             documentState = documentState,
-                            json = tryParse { json.jsonObject[template.id]!!.jsonPrimitive },
+                            json = runCatching {
+                                json.jsonObject[template.id]?.jsonPrimitive
+                                    ?.takeUnless { it.contentOrNull.isNullOrEmpty() }
+                                    ?: JsonPrimitive("0")
+                            }.getOrDefault(JsonPrimitive("0")),
                             rowIndex = rowIndex
                         ) as TextState
                     }.toImmutableList()
@@ -127,12 +156,12 @@ sealed interface Template {
         val label: String,
         val formula: Formula,
         val unit: String = "",
-        val metadata: ComputeMetadata? = null,
     ) : Template {
         override fun restore(
             documentState: DocumentState,
             json: JsonElement,
-            rowIndex: Int
+            rowIndex: Int,
+            param: Any?
         ): FieldState {
             return CalculatedState(
                 id = id,
@@ -144,7 +173,7 @@ sealed interface Template {
                     json.jsonPrimitive.contentOrNull!!
                 }.getOrDefault(""),
                 rowIndex = rowIndex,
-                metadata = metadata
+                metadata = (param as? ComputeMetadata)
             )
         }
     }
@@ -156,23 +185,25 @@ sealed interface Template {
         val name: String,
         val columns: List<Template>,
         val dependency: String? = null,
-        val total: Map<String, Calculated> = emptyMap()
+        val total: Map<String, Calculated> = emptyMap(),
+        val extraSummary: Calculated? = null
     ) : Template {
         override fun restore(
             documentState: DocumentState,
             json: JsonElement,
-            rowIndex: Int
+            rowIndex: Int,
+            param: Any?
         ): FieldState {
             val values = runCatching {
-                println(json)
                 val rows = json.jsonObject["values"]!!.jsonArray.map { it.jsonObject }
 
                 rows.mapIndexed { rowIndex, rowJson ->
                     columns.map { template ->
                         template.restore(
                             documentState = documentState,
-                            json = tryParse { rowJson[template.id]!!.jsonObject },
-                            rowIndex = rowIndex
+                            json = tryParse { rowJson[template.id]!! },
+                            rowIndex = rowIndex,
+                            param = ComputeMetadata(inTable = id)
                         )
                     }
                 }
@@ -185,7 +216,8 @@ sealed interface Template {
                     val obj = tryParse { json.jsonObject["total"]!! }
                     template.restore(
                         documentState = documentState,
-                        json = tryParse { obj.jsonObject[template.id]!!.jsonPrimitive }
+                        json = tryParse { obj.jsonObject[template.id]!!.jsonPrimitive },
+                        param = ComputeMetadata(inTable = id)
                     ) as CalculatedState
                 }
             }
@@ -199,6 +231,13 @@ sealed interface Template {
                 initialValue = values,
                 dependency = dependency,
                 documentState = documentState,
+                emptySummary = if (extraSummary != null) {
+                    { index ->
+                        extraSummary.restore(
+                            documentState, JsonNull, index, param
+                        ) as CalculatedState
+                    }
+                } else null,
                 total = totalValues.toImmutableMap()
             )
         }
@@ -227,7 +266,8 @@ sealed interface Template {
         override fun restore(
             documentState: DocumentState,
             json: JsonElement,
-            rowIndex: Int
+            rowIndex: Int,
+            param: Any?
         ): FieldState {
             val values = runCatching {
                 json.jsonArray.mapIndexed { pageIndex, pageObj ->
@@ -240,7 +280,8 @@ sealed interface Template {
                         template.restore(
                             documentState = documentState,
                             json = tryParse { originObj[template.id]!! },
-                            rowIndex = pageIndex
+                            rowIndex = pageIndex,
+                            param = ComputeMetadata(inTable = id)
                         ) as TextState
                     }.toImmutableList()
 
@@ -299,32 +340,40 @@ sealed interface Template {
     @SerialName("repeatable")
     data class Repeatable(
         override val id: String,
+        val maxEntries: Int = Int.MAX_VALUE,
         val name: String,
         val templates: List<Template>,
     ) : Template {
         override fun restore(
             documentState: DocumentState,
             json: JsonElement,
-            rowIndex: Int
+            rowIndex: Int,
+            param: Any?
         ): FieldState {
             val values = runCatching {
                 json.jsonArray.map { group ->
                     templates.map { template ->
                         template.restore(
                             documentState = documentState,
-                            json = tryParse { group.jsonObject[template.id]!!.jsonPrimitive },
-                            rowIndex = rowIndex
+                            json = tryParse { group.jsonObject[template.id]!! },
+                            rowIndex = rowIndex,
+                            param = (param as? ComputeMetadata)?.copy(inGroup = id)
                         ) as TextState
                     }
                 }
-            }.getOrDefault(
-                emptyList()
-            )
+            }
+                .onFailure {
+                    it.printStackTrace()
+                }
+                .getOrDefault(
+                    emptyList()
+                )
             return RepeatableState(
                 id = id,
                 name = name,
                 emptyTemplate = { createEmptyTemplate(documentState) },
                 initialValue = values,
+                maxEntries = maxEntries,
                 documentState = documentState
             )
         }
@@ -349,7 +398,8 @@ sealed interface Template {
         override fun restore(
             documentState: DocumentState,
             json: JsonElement,
-            rowIndex: Int
+            rowIndex: Int,
+            param: Any?
         ): FieldState {
             return LocationState(
                 id = id,

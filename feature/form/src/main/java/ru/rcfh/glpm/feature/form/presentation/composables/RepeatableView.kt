@@ -26,6 +26,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
@@ -45,8 +46,8 @@ import ru.rcfh.glpm.feature.form.R
 @Composable
 fun RepeatableView(
     state: RepeatableState,
-    horizontalPadding: PaddingValues = PaddingValues(),
     modifier: Modifier = Modifier,
+    horizontalPadding: PaddingValues = PaddingValues()
 ) {
     val windowSize = currentWindowAdaptiveInfo().windowSizeClass
 
@@ -82,6 +83,7 @@ private fun MediumContent(
             bottom = AppTheme.spacing.xs
         ),
         modifier = modifier
+            .alpha(if (state.enabled) 1f else 0.5f)
     ) {
         itemsIndexed(
             items = state.groups,
@@ -112,7 +114,11 @@ private fun MediumContent(
                 )
                 ControlHeader(
                     groupIndex = groupIndex,
-                    onRemove = { state.removeGroup(groupIndex) }
+                    onRemove = {
+                        if (state.enabled) {
+                            state.removeGroup(groupIndex)
+                        }
+                    }
                 )
                 group.forEachIndexed { index, fieldState ->
                     val theModifier = Modifier
@@ -162,11 +168,13 @@ private fun MediumContent(
                             .padding(bottom = AppTheme.spacing.s)
                     )
                 }
-                AppSmallButton(
-                    text = stringResource(R.string.button_add),
-                    onClick = state::addGroup,
-                    modifier = Modifier
-                )
+                if (state.enabled && state.canAddGroups) {
+                    AppSmallButton(
+                        text = stringResource(R.string.button_add),
+                        onClick = state::addGroup,
+                        modifier = Modifier
+                    )
+                }
             }
         }
     }
@@ -185,6 +193,7 @@ private fun CompactContent(
             bottom = AppTheme.spacing.sNudge
         ),
         modifier = modifier
+            .alpha(if (state.enabled) 1f else 0.5f)
     ) {
         Text(
             text = state.name,
@@ -196,7 +205,9 @@ private fun CompactContent(
         state.groups.forEachIndexed { groupIndex, group ->
             ControlHeader(
                 groupIndex = groupIndex,
-                onRemove = { state.removeGroup(groupIndex) }
+                onRemove = {
+                    if (state.enabled) state.removeGroup(groupIndex)
+                }
             )
             group.forEachIndexed { index, fieldState ->
                 val theModifier = Modifier
@@ -228,13 +239,16 @@ private fun CompactContent(
             modifier = Modifier
                 .padding(top = AppTheme.spacing.l)
         )
-        AppTextButton(
-            text = stringResource(R.string.button_add),
-            onClick = state::addGroup,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = AppTheme.spacing.sNudge)
-        )
+
+        if (state.enabled && state.canAddGroups) {
+            AppTextButton(
+                text = stringResource(R.string.button_add),
+                onClick = state::addGroup,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = AppTheme.spacing.sNudge)
+            )
+        }
     }
 }
 

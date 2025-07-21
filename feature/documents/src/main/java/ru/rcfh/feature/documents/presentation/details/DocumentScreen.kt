@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -21,7 +22,8 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -30,7 +32,13 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -46,16 +54,22 @@ import com.valentinilk.shimmer.rememberShimmer
 import com.valentinilk.shimmer.shimmer
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
-import ru.rcfh.core.sdui.template.FormOptions
-import ru.rcfh.core.sdui.template.FormTab
+import ru.rcfh.core.sdui.data.FileCreator
 import ru.rcfh.designsystem.component.AppBackButton
 import ru.rcfh.designsystem.component.AppCard
+import ru.rcfh.designsystem.component.AppIcon
+import ru.rcfh.designsystem.component.AppIconButton
 import ru.rcfh.designsystem.component.AppItemCard
+import ru.rcfh.designsystem.component.AppSnackbarHost
 import ru.rcfh.designsystem.component.AppTextButton
 import ru.rcfh.designsystem.component.AppTextField
 import ru.rcfh.designsystem.component.SnackbarController
 import ru.rcfh.designsystem.component.SnackbarMessage
 import ru.rcfh.designsystem.icon.AppIcons
+import ru.rcfh.designsystem.icon.Check
+import ru.rcfh.designsystem.icon.Cross
+import ru.rcfh.designsystem.icon.DocumentSaved
+import ru.rcfh.designsystem.icon.Edit
 import ru.rcfh.designsystem.icon.StatusError
 import ru.rcfh.designsystem.icon.StatusSuccess
 import ru.rcfh.designsystem.icon.StatusWarning
@@ -82,38 +96,59 @@ internal fun DocumentRoute(
         viewModel.detectErrors()
     }
 
-    DocumentScreen(
-        showBackButton = showBackButton,
-        uiState = uiState,
-        nameFieldState = viewModel.nameFieldState,
-        onBack = onBack,
-        onDeleteDocument = {
-            viewModel.deleteDocument {
-                SnackbarController.show(
-                    SnackbarMessage(
-                        text = context.getString(R.string.info_documentDeleted),
-                        icon = AppIcons.StatusError,
-                        tint = Color.Unspecified,
-                    )
-                )
-                onBack()
-            }
-        },
-        onNavigateToSummarize = viewModel::navigateToSummarize,
-        onNavigateToForm = viewModel::navigateToForm
-    )
+    when (uiState) {
+        DocumentUiState.Loading -> {}
+        is DocumentUiState.Success -> {
+            DocumentScreen(
+                showBackButton = showBackButton,
+                uiState = uiState as DocumentUiState.Success,
+                onBack = onBack,
+                onDeleteDocument = {
+                    viewModel.deleteDocument {
+                        SnackbarController.show(
+                            SnackbarMessage(
+                                text = context.getString(R.string.info_documentDeleted),
+                                icon = AppIcons.StatusError,
+                                tint = Color.Unspecified,
+                            )
+                        )
+                        onBack()
+                    }
+                },
+                onNavigateToSummarize = viewModel::navigateToSummarize,
+                onNavigateToForm = viewModel::navigateToForm,
+                onNameUpdate = viewModel::updateName,
+                onExport = {
+                    viewModel.exportFile(context) { uri ->
+                        SnackbarController.show(
+                            SnackbarMessage(
+                                text = context.getString(R.string.info_fileSaved),
+                                icon = AppIcons.StatusSuccess,
+                                tint = Color.Unspecified,
+                                actionLabel = context.getString(R.string.button_open),
+                                onAction = {
+                                    FileCreator.openFile(context)
+                                },
+                            )
+                        )
+                    }
+                }
+            )
+        }
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DocumentScreen(
     showBackButton: Boolean,
-    uiState: DocumentUiState,
+    uiState: DocumentUiState.Success,
     onNavigateToForm: (Int) -> Unit,
     onBack: () -> Unit,
     onDeleteDocument: () -> Unit,
     onNavigateToSummarize: () -> Unit,
-    nameFieldState: TextFieldState,
+    onNameUpdate: (String) -> Unit,
+    onExport: () -> Unit,
 ) {
     val context = LocalContext.current
     val windowSize = currentWindowAdaptiveInfo().windowSizeClass
@@ -133,12 +168,24 @@ private fun DocumentScreen(
                     }
                 },
                 actions = {
+                    AppIconButton(
+                        icon = AppIcon(
+                            icon = AppIcons.DocumentSaved,
+                            onClick = onExport
+                        ),
+                    )
                     AppTextButton(
                         text = stringResource(R.string.button_delete),
                         color = AppTheme.colorScheme.foregroundError,
                         onClick = onDeleteDocument
                     )
                 },
+            )
+        },
+        snackbarHost = {
+            AppSnackbarHost(
+                modifier = Modifier
+                    .navigationBarsPadding()
             )
         }
     ) { innerPadding ->
@@ -159,24 +206,72 @@ private fun DocumentScreen(
                 .padding(horizontal = AppTheme.spacing.l)
         ) {
             item {
+                val focusRequester = remember { FocusRequester() }
+                var textFieldReadOnly by rememberSaveable { mutableStateOf(true) }
+                val docName = rememberTextFieldState(uiState.document.name)
                 AppTextField(
-                    state = nameFieldState,
+                    state = docName,
                     label = stringResource(R.string.placeholder_documentName),
                     placeholder = stringResource(R.string.placeholder_documentName),
-                    error = if (nameFieldState.text.isBlank()) {
+                    error = if (docName.text.isBlank()) {
                         stringResource(R.string.error_emptyName)
                     } else null,
                     keyboardOptions = KeyboardOptions(
                         autoCorrectEnabled = true,
                         capitalization = KeyboardCapitalization.Sentences
                     ),
+                    readOnly = textFieldReadOnly,
+                    button = {
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(AppTheme.spacing.s)
+                        ) {
+                            if (textFieldReadOnly) {
+                                AppIconButton(
+                                    icon = AppIcon(
+                                        icon = AppIcons.Edit,
+                                        onClick = {
+                                            textFieldReadOnly = false
+                                            focusRequester.requestFocus()
+                                        },
+                                        tint = AppTheme.colorScheme.foreground1
+                                    ),
+                                    containerColor = AppTheme.colorScheme.background1
+                                )
+                            } else {
+                                AppIconButton(
+                                    icon = AppIcon(
+                                        icon = AppIcons.Cross,
+                                        onClick = {
+                                            textFieldReadOnly = true
+                                            docName.setTextAndPlaceCursorAtEnd(uiState.document.name)
+                                        },
+                                        tint = AppTheme.colorScheme.foreground1
+                                    ),
+                                    containerColor = AppTheme.colorScheme.background1
+                                )
+                                if (docName.text.isNotBlank()) {
+                                    AppIconButton(
+                                        icon = AppIcon(
+                                            icon = AppIcons.Check,
+                                            onClick = {
+                                                textFieldReadOnly = true
+                                                onNameUpdate(docName.text.toString())
+                                            },
+                                            tint = AppTheme.colorScheme.foregroundOnBrand
+                                        ),
+                                        containerColor = AppTheme.colorScheme.backgroundBrand
+                                    )
+                                }
+                            }
+                        }
+                    },
                     modifier = Modifier
+                        .focusRequester(focusRequester)
                         .then(
                             when {
                                 windowSize.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND) -> {
                                     Modifier.width(400.dp)
                                 }
-
                                 else -> Modifier.fillMaxWidth()
                             }
                         )

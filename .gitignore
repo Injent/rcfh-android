@@ -17,3 +17,5 @@ local.properties
 # Project exclude paths
 /build-logic/plugins/convention/build/
 /build-logic/plugins/convention/build/classes/kotlin/main/
+/app/release/
+/.kotlin/

@@ -14,21 +14,17 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import ru.rcfh.data.util.SyncManager
 import ru.rcfh.designsystem.util.ClearFocusWithImeEffect
 import ru.rcfh.presentation.App
 
 class MainActivity : ComponentActivity() {
     private val viewModel by viewModel<MainActivityViewModel>()
-    private val syncManager by inject<SyncManager>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        syncManager.requestSync()
         if (SDK_INT >= 29) {
             @Suppress("DEPRECATION")
             window.isStatusBarContrastEnforced = false

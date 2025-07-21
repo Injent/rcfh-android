@@ -6,6 +6,7 @@ import android.app.Activity
 import android.content.Intent
 import android.content.IntentSender
 import android.content.pm.PackageManager
+import android.os.Build.VERSION.SDK_INT
 import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
@@ -15,14 +16,19 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat
+import androidx.core.location.LocationCompat
+import androidx.core.location.altitude.AltitudeConverterCompat
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.LocationSettingsRequest
 import com.google.android.gms.location.Priority
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.buildJsonObject
 import ru.rcfh.core.sdui.common.DetectedError
+import ru.rcfh.core.sdui.event.SetVnum
 import java.util.Locale
 
 @Stable
@@ -84,6 +90,19 @@ class LocationState(
                         isReceiving = false
                         lat.value = location?.latitude?.round(6)?.toString() ?: ""
                         lon.value = location?.longitude?.round(6)?.toString() ?: ""
+
+                        documentScope.launch(Dispatchers.IO) {
+                            try {
+                                AltitudeConverterCompat.addMslAltitudeToLocation(this@receiveLocation, location)
+                                val mslAltitude = if (SDK_INT >= 34) {
+                                    location.mslAltitudeMeters
+                                } else {
+                                    location.extras?.getDouble(LocationCompat.EXTRA_MSL_ALTITUDE) ?: return@launch
+                                }
+                                document.postEvent(SetVnum(mslAltitude.toInt().toString()))
+                            } catch (_: Exception) {
+                            }
+                        }
                     }
                     .addOnFailureListener {
                         isReceiving = false

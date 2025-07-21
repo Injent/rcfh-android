@@ -144,17 +144,20 @@ fun DocumentListDetailScreen(
         drawerContent = {
             DocumentsNavigationDrawerContent(
                 onCreateAccountRequest = {
+                    documentRoute = DocumentPlaceholderRoute
                     scope.launch {
                         Navigator.navigate(Screen.SignIn) { launchSingleTop = true }
                     }
                 },
                 onNavigateToDrawer = { destination ->
+                    documentRoute = DocumentPlaceholderRoute
                     scope.launch {
                         drawerState.close()
                         Navigator.navigate(destination.route)
                     }
                 },
                 onChooseAccount = { account ->
+                    documentRoute = DocumentPlaceholderRoute
                     scope.launch {
                         drawerState.close()
                         viewModel.onChooseAccount(account)

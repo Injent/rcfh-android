@@ -66,7 +66,7 @@ class SummarizeViewModel(
 
     fun detectErrors() {
         viewModelScope.launch {
-            val problems = documentStateManager.detectErrors()
+            val problems = documentStateManager.detectErrors() ?: ErrorReport()
             _uiState.value = SummarizeUiState(
                 report = problems,
                 hasProblems = problems.severe.isNotEmpty() || problems.warnings.isNotEmpty()

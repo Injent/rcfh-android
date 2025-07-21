@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import ru.rcfh.core.sdui.common.RefDependency
 import ru.rcfh.core.sdui.data.DocumentStateManager
 import ru.rcfh.core.sdui.event.SetReference
 import ru.rcfh.data.model.Reference
@@ -26,7 +27,8 @@ import ru.rcfh.navigation.Screen
 data class HandbookSearchUiState(
     val results: ImmutableList<Reference> = persistentListOf(),
     val title: String,
-    val selectedOption: String?
+    val selectedOption: String?,
+    val dependencyIsNotFilled: Boolean = false
 )
 
 class HandbookSearchViewModel(
@@ -35,6 +37,7 @@ class HandbookSearchViewModel(
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     private val route = savedStateHandle.toRoute<Screen.HandbookSearch>()
+    private val dependencyIsNotFilled = route.shouldHaveFilledDependency && route.dependencyRefId == null
 
     val searchTextState = TextFieldState()
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
@@ -44,8 +47,14 @@ class HandbookSearchViewModel(
             HandbookSearchUiState(
                 title = route.title,
                 selectedOption = route.selectedOption,
+                dependencyIsNotFilled = dependencyIsNotFilled,
                 results = handbookRepository
-                    .search(handbookId = route.handbookId, query = query)
+                    .search(
+                        handbookId = route.handbookId,
+                        query = query,
+                        dependencyHandbook = route.dependencyHandbook,
+                        dependencyRefId = route.dependencyRefId
+                    )
                     .let { results ->
                         if (route.selectedOption.isNullOrEmpty()) {
                             results
@@ -61,16 +70,23 @@ class HandbookSearchViewModel(
             started = SharingStarted.WhileSubscribed(5_000),
             initialValue = HandbookSearchUiState(
                 title = route.title,
-                selectedOption = route.selectedOption
+                selectedOption = route.selectedOption,
+                dependencyIsNotFilled = dependencyIsNotFilled
             )
         )
 
-    fun sendResult(value: String) {
+    fun onSelectReference(reference: Reference) {
         viewModelScope.launch {
             documentStateManager.loadDocument(documentId = route.documentId).postEvent(
                 SetReference(
                     callbackId = route.callbackId,
-                    value = value
+                    value = reference.name,
+                    templateId = route.templateId,
+                    rowIndex = route.rowIndex,
+                    refDependency = RefDependency(
+                        handbookId = route.handbookId,
+                        refId = reference.id
+                    )
                 )
             )
             Navigator.navigateUp()

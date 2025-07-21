@@ -8,8 +8,10 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -25,6 +27,7 @@ import ru.rcfh.core.sdui.state.RatioState
 import ru.rcfh.core.sdui.state.RepeatableState
 import ru.rcfh.core.sdui.state.TableState
 import ru.rcfh.core.sdui.state.TextState
+import ru.rcfh.designsystem.component.AppBackButton
 import ru.rcfh.designsystem.theme.AppTheme
 import ru.rcfh.designsystem.util.thenIf
 import ru.rcfh.glpm.feature.form.presentation.composables.CalculatedView
@@ -47,15 +50,39 @@ fun TableRecordRoute() {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     TableRecordScreen(
+        onBack = viewModel::onBack,
         uiState = uiState
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TableRecordScreen(
+    onBack: () -> Unit,
     uiState: TableRecordUiState
 ) {
-    Scaffold { innerPadding ->
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                navigationIcon = {
+                    AppBackButton(
+                        onClick = onBack,
+                        modifier = Modifier
+                            .padding(start = AppTheme.spacing.s)
+                    )
+                },
+                title = {
+                    Text(
+                        text = uiState.tableName,
+                        style = AppTheme.typography.title3,
+                        color = AppTheme.colorScheme.foreground1,
+                        modifier = Modifier
+                            .padding(start = AppTheme.spacing.s)
+                    )
+                }
+            )
+        }
+    ) { innerPadding ->
         LazyColumn(
             contentPadding = PaddingValues(
                 top = innerPadding.calculateTopPadding() + AppTheme.spacing.l,
@@ -66,18 +93,6 @@ private fun TableRecordScreen(
                 .imePadding()
                 .focusGroup()
         ) {
-            item {
-                Text(
-                    text = uiState.tableName,
-                    style = AppTheme.typography.title3,
-                    color = AppTheme.colorScheme.foreground1,
-                    modifier = Modifier
-                        .padding(
-                            start = AppTheme.spacing.l,
-                            bottom = AppTheme.spacing.l
-                        )
-                )
-            }
             itemsIndexed(
                 items = uiState.fields
             ) { index, field ->

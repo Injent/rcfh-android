@@ -20,21 +20,30 @@ fun NetworkHandbookCollection.Handbook.toExternalModel() = Handbook(
 
 fun NetworkHandbookCollection.Handbook.Reference.toExternalModel() = Reference(
     id = id,
-    name = name
+    name = name,
+    description = description,
+    signCodes = signCodes,
+    code = code
 )
 
 fun NetworkHandbookCollection.Handbook.toEntity() = HandbookEntity(
     id = id,
-    name = name
+    name = name,
 )
 
 fun NetworkHandbookCollection.Handbook.Reference.toEntity(handbookId: Int) = ReferenceEntity(
     id = id,
     name = name,
-    handbookId = handbookId
+    handbookId = handbookId,
+    description = description,
+    code = code,
+    signCodes = signCodes
 )
 
 fun ReferenceEntity.toExternalModel() = Reference(
     id = id,
-    name = name
+    name = name,
+    description = description,
+    signCodes = signCodes,
+    code = code
 )

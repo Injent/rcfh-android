@@ -1,6 +1,5 @@
 package ru.rcfh.network.di
 
-import android.util.Log
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.engine.cio.endpoint
@@ -16,6 +15,7 @@ import kotlinx.serialization.json.Json
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 import ru.rcfh.network.ktor.KtorService
+import timber.log.Timber
 
 val NetworkModule = module {
     single {
@@ -42,7 +42,7 @@ val NetworkModule = module {
             install(Logging) {
                 logger = object : Logger {
                     override fun log(message: String) {
-                        Log.d("Ktor", message)
+                        Timber.tag("Ktor").d(message)
                     }
                 }
                 level = LogLevel.ALL

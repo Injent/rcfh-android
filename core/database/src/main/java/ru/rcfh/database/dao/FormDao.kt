@@ -11,7 +11,7 @@ import ru.rcfh.database.model.FormValidity
 @Dao
 interface FormDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAll(forms: List<FormEntity>)
+    suspend fun insertAllOrReplace(forms: List<FormEntity>)
 
     @Upsert
     suspend fun upsert(form: FormEntity)
@@ -25,6 +25,6 @@ interface FormDao {
     @Query("DELETE FROM forms WHERE document_id = :documentId")
     suspend fun deleteByDocumentId(documentId: Int)
 
-    @Query("SELECT * FROM forms WHERE document_id = :documentId")
+    @Query("SELECT form_id, is_valid FROM forms WHERE document_id = :documentId")
     suspend fun getFormsValidity(documentId: Int): List<FormValidity>
 }

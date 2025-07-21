@@ -44,9 +44,8 @@ class ComparisonTableViewModel(
             initialValue = ComparisonTableUiState.Loading
         )
 
-    fun saveAndBack() {
+    fun onBack() {
         viewModelScope.launch {
-            documentStateManager.save()
             Navigator.navigateUp()
         }
     }

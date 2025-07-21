@@ -24,7 +24,13 @@ data class NetworkHandbookCollection(
             @SerialName("id")
             val id: Int,
             @SerialName("name")
-            val name: String
+            val name: String,
+            @SerialName("description")
+            val description: String? = null,
+            @SerialName("sign_codes")
+            val signCodes: List<Int>? = null,
+            @SerialName("code")
+            val code: Int? = null
         )
     }
 }

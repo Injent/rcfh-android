@@ -42,7 +42,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import androidx.navigation.toRoute
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -59,14 +58,12 @@ import ru.rcfh.navigation.Screen
 
 fun NavGraphBuilder.handbookSearchScreen() {
     composable<Screen.HandbookSearch> {
-        HandbookSearchRoute(
-            callbackId = it.toRoute<Screen.HandbookSearch>().callbackId,
-        )
+        HandbookSearchRoute()
     }
 }
 
 @Composable
-private fun HandbookSearchRoute(callbackId: String) {
+private fun HandbookSearchRoute() {
     val scope = rememberCoroutineScope()
     val viewModel = koinViewModel<HandbookSearchViewModel>()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -74,7 +71,7 @@ private fun HandbookSearchRoute(callbackId: String) {
     HandbookSearchScreen(
         uiState = uiState,
         onSelect = { reference ->
-            viewModel.sendResult(reference.name)
+            viewModel.onSelectReference(reference)
         },
         onClose = {
             scope.launch {
@@ -159,6 +156,7 @@ private fun HandbookSearchScreen(
         uiState.selectedOption?.let { option ->
             ResultItem(
                 text = option,
+                description = null,
                 onClick = onClose,
                 selected = true,
                 modifier = Modifier
@@ -178,7 +176,22 @@ private fun HandbookSearchScreen(
             ),
             modifier = Modifier
         ) {
-            if (uiState.results.isEmpty()) {
+            if (uiState.dependencyIsNotFilled) {
+                item {
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(100.dp)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.info_dependencyReferenceNotFilled),
+                            style = AppTheme.typography.callout,
+                            color = AppTheme.colorScheme.foregroundError
+                        )
+                    }
+                }
+            } else if (uiState.results.isEmpty()) {
                 item {
                     Box(
                         contentAlignment = Alignment.Center,
@@ -196,10 +209,10 @@ private fun HandbookSearchScreen(
             }
             items(
                 items = uiState.results,
-                key = { it.id }
             ) { result ->
                 ResultItem(
                     text = result.name,
+                    description = result.description,
                     onClick = { onSelect(result) },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -212,6 +225,7 @@ private fun HandbookSearchScreen(
 @Composable
 private fun ResultItem(
     text: String,
+    description: String?,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     selected: Boolean = false,
@@ -227,14 +241,28 @@ private fun ResultItem(
                 vertical = AppTheme.spacing.l
             )
     ) {
-        Text(
-            text = text,
-            style = AppTheme.typography.callout,
-            color = AppTheme.colorScheme.foreground1,
+        Column(
             modifier = Modifier
                 .weight(1f)
                 .padding(end = AppTheme.spacing.l)
-        )
+        ) {
+            Text(
+                text = text,
+                style = AppTheme.typography.callout,
+                color = AppTheme.colorScheme.foreground1,
+                modifier = Modifier
+                    .fillMaxWidth()
+            )
+            description?.let { desc ->
+                Text(
+                    text = desc,
+                    style = AppTheme.typography.caption1,
+                    color = AppTheme.colorScheme.foreground2,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                )
+            }
+        }
 
         if (selected) {
             Icon(

@@ -14,12 +14,13 @@ import kotlinx.serialization.encoding.Encoder
 @Serializable
 @Polymorphic
 sealed interface Rule {
-    val message: String
+    val message: String?
+
     fun isMet(s: String): Boolean
 
     @Serializable
     @SerialName("required")
-    data class Required(override val message: String) : Rule {
+    data class Required(override val message: String? = null) : Rule {
         override fun isMet(s: String): Boolean {
             return s.isNotBlank()
         }
@@ -30,7 +31,7 @@ sealed interface Rule {
     data class DigitFormat(
         val decimalSize: Int,
         val precise: Int? = null,
-        override val message: String,
+        override val message: String?,
     ) : Rule {
         override fun isMet(s: String): Boolean {
             if (s.isEmpty()) return true
@@ -59,7 +60,7 @@ sealed interface Rule {
     data class Regex(
         @Serializable(RegexSerializer::class)
         private val regex: kotlin.text.Regex,
-        override val message: String
+        override val message: String?
     ) : Rule {
         override fun isMet(s: String): Boolean {
             return regex.matches(s)
@@ -77,6 +78,19 @@ sealed interface Rule {
 
         override fun isMet(s: String): Boolean {
             return regex.matches(s)
+        }
+    }
+
+    @Serializable
+    @SerialName("range")
+    data class Range(
+        private val min: Float,
+        private val max: Float,
+        override val message: String? = null
+    ) : Rule {
+        override fun isMet(s: String): Boolean {
+            val number = s.toFloatOrNull() ?: return true
+            return number in min..max
         }
     }
 }

@@ -63,12 +63,17 @@ sealed interface Screen {
     data object Home : Screen
 
     @Serializable
-    data class HandbookSearch(
+    class HandbookSearch(
         val documentId: Int,
         val handbookId: Int,
         val callbackId: String,
         val title: String,
-        val selectedOption: String?
+        val selectedOption: String?,
+        val rowIndex: Int,
+        val templateId: String,
+        val dependencyHandbook: Int?,
+        val dependencyRefId: Int?,
+        val shouldHaveFilledDependency: Boolean
     ) : Screen
 
     @Serializable

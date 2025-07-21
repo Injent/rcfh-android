@@ -70,7 +70,7 @@ val Form2 = FormTemplate(
         ),
         Template.ComparisonTable(
             id = "2table",
-            name = "Характеристика участка",
+            name = "Характеристика насаждения общая",
             maxEntries = 1,
             templates = listOf(
                 Template.Text(
@@ -167,7 +167,7 @@ val Form2 = FormTemplate(
         ),
         Template.ComparisonTable(
             id = "2table2",
-            name = "Характ-ка насаждения",
+            name = "Характеристика насаждения по ярусам",
             templates = listOf(
                 Template.Text(
                     id = "yarushm",
@@ -201,27 +201,15 @@ val Form2 = FormTemplate(
                 Template.Text(
                     id = "klvozrto",
                     label = "Класс возраста",
-                    visual = Visual.Decimal(unit = null),
-                    rules = listOf(
-                        Rule.DigitFormat(
-                            decimalSize = 1,
-                            message = DIGIT_MESSAGE
-                        )
-                    )
+                    visual = Visual.Reference(handbookId = 26),
                 ),
                 Template.Text(
                     id = "grvozrto",
                     label = "Группа возраста",
-                    visual = Visual.Decimal(unit = null),
-                    rules = listOf(
-                        Rule.DigitFormat(
-                            decimalSize = 1,
-                            message = DIGIT_MESSAGE
-                        )
-                    )
+                    visual = Visual.Reference(handbookId = 27),
                 ),
                 Template.Text(
-                    id = "polnotato",
+                    id = "polnota",
                     label = "Полнота",
                     rules = listOf(
                         Rule.Required("Поле пусто"),
@@ -229,6 +217,11 @@ val Form2 = FormTemplate(
                             decimalSize = 1,
                             precise = 2,
                             message = DIGIT_MESSAGE
+                        ),
+                        Rule.Range(
+                            min = 0f,
+                            max = 1.3f,
+                            message = "Число превышает максимальное значение (1,3)"
                         )
                     ),
                     visual = Visual.Number(unit = "0,1 доли ед.")
@@ -244,7 +237,7 @@ val Form2 = FormTemplate(
                             message = DIGIT_MESSAGE
                         )
                     ),
-                    visual = Visual.Number(unit = "м3/га")
+                    visual = Visual.Number(unit = "м3")
                 ),
                 Template.Text(
                     id = "zapassirto",
@@ -263,7 +256,7 @@ val Form2 = FormTemplate(
         ),
         Template.ComparisonTable(
             id = "species_specs",
-            name = "Характ-ка породы",
+            name = "Характеристика породы",
             templates = listOf(
                 Template.Text(
                     id = "yarus",
@@ -287,13 +280,13 @@ val Form2 = FormTemplate(
                             message = DIGIT_MESSAGE
                         )
                     ),
-                    visual = Visual.Decimal(unit = null),
+                    visual = Visual.Decimal(unit = null, canSetPlus = true),
                 ),
                 Template.Text(
                     id = "kodporoda",
                     label = "Порода",
                     rules = listOf(Rule.Required("Поле пусто")),
-                    visual = Visual.Reference(handbookId = 1), // TODO
+                    visual = Visual.Reference(handbookId = 31),
                 ),
                 Template.Text(
                     id = "vozr",
@@ -332,7 +325,7 @@ val Form2 = FormTemplate(
                 ),
                 Template.Text(
                     id = "zapaspor",
-                    label = "Запас, кбм",
+                    label = "Запас, кбм на га",
                     visual = Visual.Number(unit = "м3"),
                     rules = listOf(
                         Rule.DigitFormat(

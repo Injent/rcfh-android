@@ -1,6 +1,5 @@
 package ru.rcfh.glpm.feature.form.presentation.comparisontable
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.spring
@@ -69,6 +68,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import ru.rcfh.core.sdui.state.TextState
+import ru.rcfh.designsystem.component.AppBackButton
 import ru.rcfh.designsystem.component.AppIcon
 import ru.rcfh.designsystem.component.AppIconButton
 import ru.rcfh.designsystem.component.AppSmallButton
@@ -104,14 +104,11 @@ private fun ComparisonTableRoute(
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    BackHandler {
-        viewModel.saveAndBack()
-    }
-
     when (uiState) {
         ComparisonTableUiState.Loading -> {}
         is ComparisonTableUiState.Success -> {
             ComparisonTableScreen(
+                onBack = viewModel::onBack,
                 uiState = uiState as ComparisonTableUiState.Success,
                 initialRowIndex = initialRowIndex
             )
@@ -122,6 +119,7 @@ private fun ComparisonTableRoute(
 @Composable
 private fun ComparisonTableScreen(
     uiState: ComparisonTableUiState.Success,
+    onBack: () -> Unit,
     initialRowIndex: Int?
 ) {
     val window = currentWindowAdaptiveInfo().windowSizeClass
@@ -160,7 +158,7 @@ private fun ComparisonTableScreen(
                     )
                 }
 
-                TableBottomBar(
+                TableTopBar(
                     currentPage = pagerState.currentPage,
                     pageCount = pagerState.pageCount,
                     maxEntries = uiState.state.maxEntries,
@@ -181,6 +179,7 @@ private fun ComparisonTableScreen(
                             )
                         }
                     },
+                    onBack = onBack,
                     modifier = Modifier
                         .fillMaxWidth()
                         .statusBarsPadding()
@@ -459,13 +458,14 @@ private fun DeleteDialog(
 }
 
 @Composable
-private fun TableBottomBar(
+private fun TableTopBar(
     pageCount: Int,
     currentPage: Int,
     maxEntries: Int,
     onChangePage: (Int) -> Unit,
     onDeleteRequest: () -> Unit,
     onCreateRequest: () -> Unit,
+    onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val listState = rememberLazyListState()
@@ -487,6 +487,11 @@ private fun TableBottomBar(
             modifier = Modifier
                 .padding(AppTheme.spacing.xs)
         ) {
+            AppBackButton(
+                onClick = onBack,
+                modifier = Modifier
+                    .padding(end = AppTheme.spacing.s)
+            )
             LazyRow(
                 state = listState,
                 horizontalArrangement = Arrangement.spacedBy(AppTheme.spacing.xs),

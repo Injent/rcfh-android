@@ -3,11 +3,12 @@ package ru.rcfh.glpm.feature.form.presentation.table
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -16,10 +17,8 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import org.koin.androidx.compose.koinViewModel
 import ru.rcfh.core.sdui.state.TableState
+import ru.rcfh.designsystem.component.AppBackButton
 import ru.rcfh.designsystem.theme.AppTheme
-import ru.rcfh.designsystem.util.ScreenRotation
-import ru.rcfh.designsystem.util.screenRotation
-import ru.rcfh.designsystem.util.thenIf
 import ru.rcfh.glpm.feature.form.presentation.composables.TableView
 import ru.rcfh.navigation.Screen
 
@@ -37,30 +36,47 @@ fun TableRoute() {
     if (uiState != null) {
         TableScreen(
             tableState = uiState as TableState,
+            onBack = viewModel::onBack,
             onEditRow = viewModel::onEditRow
         )
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TableScreen(
     tableState: TableState,
+    onBack: () -> Unit,
     onEditRow: (rowIdx: Int) -> Unit,
 ) {
-    val screenRotation = screenRotation()
-
     Scaffold(
         contentWindowInsets = WindowInsets(0),
+        topBar = {
+            TopAppBar(
+                navigationIcon = {
+                    AppBackButton(
+                        onClick = onBack,
+                        modifier = Modifier
+                            .padding(start = AppTheme.spacing.s)
+                    )
+                },
+                title = {
+                    Text(
+                        text = tableState.name,
+                        style = AppTheme.typography.title3,
+                        color = AppTheme.colorScheme.foreground1,
+                        modifier = Modifier
+                            .padding(start = AppTheme.spacing.s)
+                    )
+                }
+            )
+        }
     ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .background(AppTheme.colorScheme.tableHeader)
                 .padding(innerPadding)
-                .systemBarsPadding()
-                .thenIf(screenRotation == ScreenRotation.LEFT) {
-                    displayCutoutPadding()
-                }
         ) {
             TableView(
                 state = tableState,
