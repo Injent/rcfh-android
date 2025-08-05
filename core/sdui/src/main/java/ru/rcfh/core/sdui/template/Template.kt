@@ -29,6 +29,7 @@ import ru.rcfh.core.sdui.state.LinkedState
 import ru.rcfh.core.sdui.state.LocationState
 import ru.rcfh.core.sdui.state.RatioState
 import ru.rcfh.core.sdui.state.RepeatableState
+import ru.rcfh.core.sdui.state.Table4State
 import ru.rcfh.core.sdui.state.TablePageState
 import ru.rcfh.core.sdui.state.TableState
 import ru.rcfh.core.sdui.state.TextState
@@ -186,7 +187,7 @@ sealed interface Template {
         val columns: List<Template>,
         val dependency: String? = null,
         val total: Map<String, Calculated> = emptyMap(),
-        val extraSummary: Calculated? = null
+        val extraSummary: Calculated? = null,
     ) : Template {
         override fun restore(
             documentState: DocumentState,
@@ -224,22 +225,27 @@ sealed interface Template {
                 .onFailure { it.printStackTrace() }
                 .getOrDefault(emptyMap())
 
-            return TableState(
-                id = id,
-                name = name,
-                emptyTemplate = { index -> createEmptyTemp(documentState, index) },
-                initialValue = values,
-                dependency = dependency,
-                documentState = documentState,
-                emptySummary = if (extraSummary != null) {
-                    { index ->
-                        extraSummary.restore(
-                            documentState, JsonNull, index, param
-                        ) as CalculatedState
-                    }
-                } else null,
-                total = totalValues.toImmutableMap()
-            )
+            return if (id == "4table") {
+                Table4State(
+                    id = id,
+                    name = name,
+                    rowTemp = { index -> createEmptyTemp(documentState, index) },
+                    dependency = dependency,
+                    document = documentState,
+                    initialValue = values
+                )
+            } else {
+                TableState(
+                    id = id,
+                    name = name,
+                    emptyTemplate = { index -> createEmptyTemp(documentState, index) },
+                    initialValue = values,
+                    dependency = dependency,
+                    documentState = documentState,
+                    total = totalValues.toImmutableMap(),
+                    triggerIds = columns.map { it.id }
+                )
+            }
         }
 
         private fun createEmptyTemp(
@@ -358,7 +364,7 @@ sealed interface Template {
                             json = tryParse { group.jsonObject[template.id]!! },
                             rowIndex = rowIndex,
                             param = (param as? ComputeMetadata)?.copy(inGroup = id)
-                        ) as TextState
+                        )
                     }
                 }
             }

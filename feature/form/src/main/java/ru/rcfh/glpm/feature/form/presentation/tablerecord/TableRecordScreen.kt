@@ -142,6 +142,7 @@ private fun TableRecordScreen(
                     is ComparisonTableState,
                     is TableState,
                     is LocationState -> { /* No op */ }
+                    else -> TODO()
                 }
             }
         }

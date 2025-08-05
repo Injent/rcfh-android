@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.BasicSecureTextField
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
@@ -25,6 +26,7 @@ import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -58,6 +60,7 @@ import kotlinx.datetime.format.byUnicodePattern
 import kotlinx.datetime.toLocalDateTime
 import ru.rcfh.designsystem.icon.AppIcons
 import ru.rcfh.designsystem.icon.Calendar
+import ru.rcfh.designsystem.icon.Cross
 import ru.rcfh.designsystem.icon.Handbook
 import ru.rcfh.designsystem.theme.AppTheme
 
@@ -65,6 +68,7 @@ import ru.rcfh.designsystem.theme.AppTheme
 fun ReferenceTextField(
     value: String,
     onClick: () -> Unit,
+    onClear: () -> Unit,
     modifier: Modifier = Modifier,
     placeholder: String = "",
     error: String? = null,
@@ -92,6 +96,18 @@ fun ReferenceTextField(
                 placeholder = placeholder,
                 isEmpty = value.isEmpty(),
                 error = error,
+                trailingIcon = {
+                    if (value.isNotEmpty()) {
+                        Icon(
+                            imageVector = AppIcons.Cross,
+                            contentDescription = null,
+                            tint = AppTheme.colorScheme.foreground2,
+                            modifier = Modifier
+                                .size(20.dp)
+                                .clickable { onClear() }
+                        )
+                    }
+                },
                 button = {
                     AppIconButton(
                         icon = AppIcon(
@@ -241,7 +257,7 @@ fun AppTextField(
         },
         maxLines = when (lineLimits) {
             is TextFieldLineLimits.MultiLine -> lineLimits.maxHeightInLines
-            TextFieldLineLimits.SingleLine -> 1
+            TextFieldLineLimits.SingleLine -> 3
         },
         readOnly = readOnly,
         visualTransformation = VisualTransformation.None,

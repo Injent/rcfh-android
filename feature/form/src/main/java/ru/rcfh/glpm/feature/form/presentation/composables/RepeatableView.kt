@@ -139,6 +139,12 @@ private fun MediumContent(
                                 modifier = theModifier
                             )
                         }
+                        is RepeatableState -> {
+                            CompactContent(
+                                state = fieldState,
+                                modifier = theModifier
+                            )
+                        }
                         else -> Unit
                     }
                 }
@@ -225,6 +231,12 @@ private fun CompactContent(
                         TextFieldView(
                             state = fieldState,
                             onCard = true,
+                            modifier = theModifier
+                        )
+                    }
+                    is RepeatableState -> {
+                        CompactContent(
+                            state = fieldState,
                             modifier = theModifier
                         )
                     }

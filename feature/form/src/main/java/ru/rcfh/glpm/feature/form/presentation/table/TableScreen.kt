@@ -16,10 +16,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import org.koin.androidx.compose.koinViewModel
-import ru.rcfh.core.sdui.state.TableState
+import ru.rcfh.core.sdui.state.FieldState
+import ru.rcfh.core.sdui.state.Table4State
 import ru.rcfh.designsystem.component.AppBackButton
 import ru.rcfh.designsystem.theme.AppTheme
-import ru.rcfh.glpm.feature.form.presentation.composables.TableView
+import ru.rcfh.glpm.feature.form.presentation.composables.Table4View
 import ru.rcfh.navigation.Screen
 
 fun NavGraphBuilder.tableScreen() {
@@ -35,7 +36,7 @@ fun TableRoute() {
 
     if (uiState != null) {
         TableScreen(
-            tableState = uiState as TableState,
+            tableState = uiState as FieldState,
             onBack = viewModel::onBack,
             onEditRow = viewModel::onEditRow
         )
@@ -45,7 +46,7 @@ fun TableRoute() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TableScreen(
-    tableState: TableState,
+    tableState: FieldState,
     onBack: () -> Unit,
     onEditRow: (rowIdx: Int) -> Unit,
 ) {
@@ -62,7 +63,7 @@ private fun TableScreen(
                 },
                 title = {
                     Text(
-                        text = tableState.name,
+                        text = "Таблица",
                         style = AppTheme.typography.title3,
                         color = AppTheme.colorScheme.foreground1,
                         modifier = Modifier
@@ -78,11 +79,14 @@ private fun TableScreen(
                 .background(AppTheme.colorScheme.tableHeader)
                 .padding(innerPadding)
         ) {
-            TableView(
-                state = tableState,
-                onEditRequest = onEditRow,
-                modifier = Modifier
-            )
+            when (tableState.id) {
+                "4table" -> {
+                    Table4View(
+                        state = tableState as Table4State,
+                        onEditRow = onEditRow
+                    )
+                }
+            }
         }
     }
 }

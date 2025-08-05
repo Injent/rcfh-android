@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.clearText
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -31,6 +32,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -79,6 +81,7 @@ import ru.rcfh.feature.documents.R
 @Composable
 internal fun DocumentRoute(
     documentId: Int,
+    isNew: Boolean,
     showBackButton: Boolean,
     onBack: () -> Unit,
 ) {
@@ -100,6 +103,7 @@ internal fun DocumentRoute(
         DocumentUiState.Loading -> {}
         is DocumentUiState.Success -> {
             DocumentScreen(
+                isNew = isNew,
                 showBackButton = showBackButton,
                 uiState = uiState as DocumentUiState.Success,
                 onBack = onBack,
@@ -142,6 +146,7 @@ internal fun DocumentRoute(
 @Composable
 private fun DocumentScreen(
     showBackButton: Boolean,
+    isNew: Boolean,
     uiState: DocumentUiState.Success,
     onNavigateToForm: (Int) -> Unit,
     onBack: () -> Unit,
@@ -277,6 +282,14 @@ private fun DocumentScreen(
                         )
                         .padding(bottom = AppTheme.spacing.l)
                 )
+
+                LaunchedEffect(Unit) {
+                    if (isNew) {
+                        docName.clearText()
+                        textFieldReadOnly = false
+                        focusRequester.requestFocus()
+                    }
+                }
             }
             item {
                 Box(Modifier.animateContentSize()) {

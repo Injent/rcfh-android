@@ -72,14 +72,15 @@ import java.time.format.FormatStyle
 @Composable
 internal fun DocumentListRoute(
     viewModel: DocumentListViewModel,
-    onSelectDocument: (Int) -> Unit,
+    onSelectDocument: (id: Int) -> Unit,
+    onCreateDocument: (id: Int) -> Unit,
     onMenuClick: () -> Unit
 ) {
     val context = LocalContext.current
 
     ListenEvents(viewModel.events) { event ->
         when (event) {
-            is DocumentListEvent.DocumentCreated -> onSelectDocument(event.documentId)
+            is DocumentListEvent.DocumentCreated -> onCreateDocument(event.documentId)
         }
     }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()

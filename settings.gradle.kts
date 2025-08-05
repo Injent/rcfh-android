@@ -20,6 +20,7 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven("https://releases.aspose.com/java/repo/")
     }
 }
 

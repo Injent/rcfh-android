@@ -15,6 +15,7 @@ import ru.rcfh.core.sdui.data.DocumentRepository
 import ru.rcfh.core.sdui.data.DocumentStateManager
 import ru.rcfh.core.sdui.data.FormRepo
 import ru.rcfh.core.sdui.state.FormState
+import ru.rcfh.core.sdui.state.Table4State
 import ru.rcfh.core.sdui.state.TableState
 import ru.rcfh.core.sdui.template.FormOptions
 import ru.rcfh.core.sdui.template.FormTab
@@ -83,8 +84,14 @@ class FormViewModel(
         val isEmpty = state
             .formState
             .fields
-            .find { it.id == tableId && it is TableState }
-            .let { (it as TableState).rows.isEmpty() }
+            .find { it.id == tableId }
+            .let {
+                when (it) {
+                    is TableState -> it.rows.isEmpty()
+                    is Table4State -> it.rows.isEmpty()
+                    else -> true
+                }
+            }
 
         viewModelScope.launch {
             if (isEmpty) {

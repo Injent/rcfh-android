@@ -99,6 +99,9 @@ fun TextFieldView(
                 label = state.label,
                 error = if (state.enabled) state.error else null,
                 placeholder = stringResource(R.string.placeholder_reference),
+                onClear = {
+                    state.setReference(refDependency = null, value = "")
+                },
                 onClick = {
                     if (!state.enabled) return@ReferenceTextField
                     scope.launch {

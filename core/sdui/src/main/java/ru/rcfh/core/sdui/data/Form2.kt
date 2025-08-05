@@ -241,7 +241,7 @@ val Form2 = FormTemplate(
                 ),
                 Template.Text(
                     id = "zapassirto",
-                    label = "Запас сырораст., кбм на выдел",
+                    label = "Запас сырораст.на выдел по составляющим породам",
                     rules = listOf(
                         Rule.Required("Поле пусто"),
                         Rule.DigitFormat(

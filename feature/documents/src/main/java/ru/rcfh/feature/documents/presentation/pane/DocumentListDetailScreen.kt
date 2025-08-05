@@ -66,7 +66,7 @@ import ru.rcfh.navigation.toRoute
 internal object DocumentPlaceholderRoute
 
 @Serializable
-internal data class DocumentRoute(val documentId: Int)
+internal data class DocumentScreen(val documentId: Int, val isNew: Boolean = false)
 
 fun NavGraphBuilder.documentsScreen() {
     composable<Screen.Documents>(
@@ -121,14 +121,14 @@ fun DocumentListDetailScreen(
             listDetailNavigator.navigateBack()
         }
     }
-    var documentRoute by rememberSaveable(saver = DocumentRoute.Saver) {
-        val route = selectedDocumentId?.let { DocumentRoute(documentId = it) }
+    var documentRoute by rememberSaveable(saver = DocumentScreen.Saver) {
+        val route = selectedDocumentId?.let { DocumentScreen(documentId = it) }
             ?: DocumentPlaceholderRoute
         mutableStateOf(route)
     }
 
-    fun onDocumentClick(documentId: Int) {
-        documentRoute = DocumentRoute(documentId = documentId)
+    fun onDocumentClick(documentId: Int, isNew: Boolean) {
+        documentRoute = DocumentScreen(documentId = documentId, isNew = isNew)
         scope.launch {
             listDetailNavigator.navigateTo(ListDetailPaneScaffoldRole.Detail)
         }
@@ -188,8 +188,11 @@ fun DocumentListDetailScreen(
                                 }
                             }
                         },
-                        onSelectDocument = {
-                            onDocumentClick(it)
+                        onCreateDocument = { id ->
+                            onDocumentClick(documentId = id, isNew = true)
+                        },
+                        onSelectDocument = { id ->
+                            onDocumentClick(documentId = id, isNew = false)
                         }
                     )
                 }
@@ -208,9 +211,10 @@ fun DocumentListDetailScreen(
                     AnimatedContent(documentRoute) { route ->
                         when (route) {
                             is DocumentPlaceholderRoute -> DocumentPlaceholder()
-                            is DocumentRoute -> {
+                            is DocumentScreen -> {
                                 DocumentRoute(
                                     documentId = route.documentId,
+                                    isNew = route.isNew,
                                     showBackButton = !listDetailNavigator.isListPaneVisible(),
                                     onBack = {
                                         scope.launch {
@@ -270,17 +274,17 @@ private fun <T> ThreePaneScaffoldNavigator<T>.isListPaneVisible(): Boolean =
 private fun <T> ThreePaneScaffoldNavigator<T>.isDetailPaneVisible(): Boolean =
     scaffoldValue[ListDetailPaneScaffoldRole.Detail] == PaneAdaptedValue.Expanded
 
-private val DocumentRoute.Companion.Saver: Saver<MutableState<Any>, Int>
+private val DocumentScreen.Companion.Saver: Saver<MutableState<Any>, Int>
     get() = Saver(
         save = {
-            (it.value as? DocumentRoute)?.documentId ?: -1
+            (it.value as? DocumentScreen)?.documentId ?: -1
         },
         restore = {
             mutableStateOf(
                 if (it == -1) {
                     DocumentPlaceholderRoute
                 } else {
-                    DocumentRoute(documentId = it)
+                    DocumentScreen(documentId = it)
                 }
             )
         }

@@ -13,73 +13,6 @@ val Form4 = FormTemplate(
         Template.Table(
             id = "4table",
             name = "Таблица 4 формы",
-            total = mapOf(
-                "bpodolap" to Template.Calculated(
-                    id = "bponas",
-                    label = "",
-                    formula = "SUM({bpodolap}*{dolap})/10".toFormula()
-                ),
-                "osldolap" to Template.Calculated(
-                    id = "oslnas",
-                    label = "",
-                    formula = "SUM({osldolap}*{dolap})/10".toFormula()
-                ),
-                "sosldolap" to Template.Calculated(
-                    id = "soslnas",
-                    label = "",
-                    formula = "SUM({sosldolap}*{dolap})/10".toFormula()
-                ),
-                "usdolap" to Template.Calculated(
-                    id = "usnas",
-                    label = "",
-                    formula = "SUM({usdolap}*{dolap})/10".toFormula()
-                ),
-                "svsuhdolap" to Template.Calculated(
-                    id = "svsuhnas",
-                    label = "",
-                    formula = "SUM({svsuhdolap}*{dolap})/10".toFormula()
-                ),
-                "svvtrdolap" to Template.Calculated(
-                    id = "svvtrnas",
-                    label = "",
-                    formula = "SUM({svvtrdolap}*{dolap})/10".toFormula()
-                ),
-                "svburdolap" to Template.Calculated(
-                    id = "svburnas",
-                    label = "",
-                    formula = "SUM({svburdolap}*{dolap})/10".toFormula()
-                ),
-                "stsuhdolap" to Template.Calculated(
-                    id = "stsuhnas",
-                    label = "",
-                    formula = "SUM({stsuhdolap}*{dolap})/10".toFormula()
-                ),
-                "stvtrdolap" to Template.Calculated(
-                    id = "stvtrnas",
-                    label = "",
-                    formula = "SUM({stvtrdolap}*{dolap})/10".toFormula()
-                ),
-                "stburdolap" to Template.Calculated(
-                    id = "stvtrnas",
-                    label = "",
-                    formula = "SUM({stburdolap}*{dolap})/10".toFormula()
-                ),
-                "sksporoda" to Template.Calculated(
-                    id = "sksnas",
-                    label = "",
-                    formula = "SUM({sksporoda}*{dolap})/10".toFormula()
-                ),
-                "ooporoda" to Template.Calculated(
-                    id = "oonas",
-                    label = "",
-                    formula = "SUM({ooporoda}*{dolap})/10".toFormula()
-                ),
-                "toporoda" to Template.Calculated(
-                    id = "tonas",
-                    label = "",
-                    formula = "SUM({toporoda}*{dolap})/10".toFormula()
-                )
-            ),
             dependency = "species_specs",
             columns = listOf(
                 Template.Linked(
@@ -105,6 +38,10 @@ val Form4 = FormTemplate(
                 Template.Linked(
                     id = "dsr",
                     label = "Ср. диаметр"
+                ),
+                Template.Linked(
+                    id = "zapaspor",
+                    label = "Запас"
                 ),
                 Template.Ratio(
                     id = "4ratio",
@@ -238,40 +175,47 @@ val Form4 = FormTemplate(
                     formula = "{usdolap}+{svsuhdolap}+{svvtrdolap}+{svburdolap}".toFormula(),
                     unit = "%"
                 ),
-                Template.Text(
-                    id = "prichina",
-                    label = "Причины повреждения",
-                    visual = Visual.Reference(handbookId = 10),
-                    rules = listOf(Rule.Required("Поле не заполнено"))
-                ),
-                Template.Text(
-                    id = "godpovr",
-                    label = "Год ослабления, повреждения насаждения",
-                    visual = Visual.Date(format = "yyyy"),
-                    rules = listOf(Rule.Required("Поле не заполнено"))
-                ),
                 Template.Repeatable(
                     id = "4repeatable",
                     name = "Признаки повреждения по породам",
                     templates = listOf(
                         Template.Text(
-                            id = "prizn",
-                            label = "Признак",
-                            visual = Visual.Reference(handbookId = 9, dependsOn = "prichina"),
+                            id = "prichina",
+                            label = "Причины повреждения",
+                            visual = Visual.Reference(handbookId = 10),
                             rules = listOf(Rule.Required("Поле не заполнено"))
                         ),
                         Template.Text(
-                            id = "dolaprizn",
-                            label = "Доля повреждённых деревьев от запаса породы",
-                            visual = Visual.Decimal(unit = "%"),
-                            rules = listOf(
-                                Rule.Required("Поле не заполнено"),
-                                Rule.DigitFormat(
-                                    decimalSize = 3,
-                                    message = DIGIT_MESSAGE
-                                )
-                            )
+                            id = "godpovr",
+                            label = "Год ослабления, повреждения насаждения",
+                            visual = Visual.Date(format = "yyyy"),
+                            rules = listOf(Rule.Required("Поле не заполнено"))
                         ),
+                        Template.Repeatable(
+                            id = "priznList",
+                            maxEntries = 5,
+                            name = "Причина",
+                            templates = listOf(
+                                Template.Text(
+                                    id = "prizn",
+                                    label = "Признак",
+                                    visual = Visual.Reference(handbookId = 9, dependsOn = "prichina"),
+                                    rules = listOf(Rule.Required("Поле не заполнено"))
+                                ),
+                                Template.Text(
+                                    id = "dolaprizn",
+                                    label = "Доля повреждённых деревьев от запаса породы",
+                                    visual = Visual.Decimal(unit = "%"),
+                                    rules = listOf(
+                                        Rule.Required("Поле не заполнено"),
+                                        Rule.DigitFormat(
+                                            decimalSize = 3,
+                                            message = DIGIT_MESSAGE
+                                        )
+                                    )
+                                ),
+                            )
+                        )
                     )
                 )
             )

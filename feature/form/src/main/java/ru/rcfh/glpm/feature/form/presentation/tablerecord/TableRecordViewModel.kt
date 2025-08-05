@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import ru.rcfh.core.sdui.data.DocumentStateManager
 import ru.rcfh.core.sdui.state.FieldState
-import ru.rcfh.core.sdui.state.TableState
+import ru.rcfh.core.sdui.state.Table4State
 import ru.rcfh.navigation.Navigator
 import ru.rcfh.navigation.Screen
 
@@ -29,14 +29,20 @@ class TableRecordViewModel(
     private val route = savedStateHandle.toRoute<Screen.TableRecord>()
 
     val uiState = flow {
-        val tableName: String
+        var tableName: String = ""
         documentStateManager.loadDocument(route.documentId)
             .forms[route.formId]!!
             .fields
-            .find { it is TableState && it.id == route.templateId }
-            .let { it as TableState }
-            .also { tableName = it.name }
-            .rows
+            .find { it.id == route.templateId }
+            .let {
+                when (it) {
+                    is Table4State -> {
+                        tableName = it.name
+                        it.rows
+                    }
+                    else -> emptyList()
+                }
+            }
             .let { rows ->
                 TableRecordUiState(
                     tableName = tableName,

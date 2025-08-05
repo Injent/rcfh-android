@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import ru.rcfh.core.sdui.data.DocumentStateManager
-import ru.rcfh.core.sdui.state.TableState
 import ru.rcfh.navigation.Navigator
 import ru.rcfh.navigation.Screen
 
@@ -23,8 +22,7 @@ class TableViewModel(
         documentStateManager.loadDocument(route.documentId)
             .forms[route.formId]!!
             .fields
-            .find { it.id == route.templateId && it is TableState }
-            .let { it as TableState }
+            .find { it.id == route.templateId }
             .let { emit(it) }
     }
         .stateIn(

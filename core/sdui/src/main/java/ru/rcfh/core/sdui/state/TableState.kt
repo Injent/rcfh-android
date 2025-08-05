@@ -8,7 +8,6 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.toMutableStateList
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.addJsonObject
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.putJsonArray
@@ -17,10 +16,14 @@ import ru.rcfh.core.sdui.common.DetectedError
 import ru.rcfh.core.sdui.common.ErrorAddress
 import ru.rcfh.core.sdui.common.IndexAwareStateList
 import ru.rcfh.core.sdui.common.Row
-import ru.rcfh.core.sdui.event.AddGroup
 import ru.rcfh.core.sdui.event.AddPage
 import ru.rcfh.core.sdui.event.RemovePage
 import ru.rcfh.core.sdui.event.SetPlus
+
+data class Total(
+    val name: String,
+    val row: List<Double>
+)
 
 @Stable
 class TableState(
@@ -28,10 +31,10 @@ class TableState(
     val name: String,
     private val emptyTemplate: (Int) -> SnapshotStateList<FieldState>,
     val total: ImmutableMap<String, CalculatedState>,
-    private val emptySummary: ((Int) -> CalculatedState)? = null,
     documentState: DocumentState,
     val dependency: String? = null,
-    initialValue: List<List<FieldState>>
+    initialValue: List<List<FieldState>>,
+    triggerIds: List<String>,
 ): FieldState(documentState), Container {
     val columnsCount = emptyTemplate(-1).size
     val rows = IndexAwareStateList(initialValue.map {
@@ -39,16 +42,9 @@ class TableState(
             delegate = it.toMutableStateList()
         )
     }.toMutableStateList())
-
-    var extraSummaries by mutableStateOf(calculate())
-        private set
+    var totals by mutableStateOf(emptyList<Total>())
 
     init {
-        document.observeEvent(AddGroup::class) { event ->
-            if (event.tableId == id) {
-                extraSummaries = calculate()
-            }
-        }
         document.observeEvent(AddPage::class) { event ->
             if (event.templateId == dependency) {
                 addRow()
@@ -79,11 +75,11 @@ class TableState(
         return rows.flatten() + total.values
     }
 
-    fun addRow() {
+    private fun addRow() {
         rows.add(Row(emptyTemplate(rows.size)))
     }
 
-    fun removeRow(index: Int) {
+    private fun removeRow(index: Int) {
         rows.removeAt(index)
     }
 
@@ -122,29 +118,49 @@ class TableState(
                     put(state.id, state.save())
                 }
             }
-            putJsonArray("extra") {
-                extraSummaries.forEach {
-                    add(JsonPrimitive(it.value))
-                }
-            }
         }
     }
+}
 
-    private fun calculate(): List<CalculatedState> {
-        if (emptySummary == null) return emptyList()
-        val maxGroupsCount = rows.maxOf { row ->
-            row.maxOf { field ->
-                when (field) {
-                    is RepeatableState -> field.groups.size
-                    else -> 0
+fun Row.toMap(): Map<String, String?> {
+    val list = mutableMapOf<String, String?>()
+
+    forEach { item ->
+        when (item) {
+            is Container -> item.items().forEach {
+                list[it.id] = it.getValue()
+            }
+            else -> list[item.id] = item.getValue()
+        }
+    }
+    return list
+}
+
+fun Row.getValue(id: String): String? {
+    for (item in this) {
+        when (item) {
+            is CalculatedState -> if (item.id == id) return item.value
+            is LinkedState -> if (item.id == id) return item.value
+            is TextState -> if (item.id == id) return item.value
+            is Container -> item.items().find { it.id == id }?.let {
+                when (it) {
+                    is CalculatedState -> return it.value
+                    is TextState -> return it.value
+                    is LinkedState -> return it.value
+                    else -> Unit
                 }
             }
+            else -> Unit
         }
+    }
+    return null
+}
 
-        return buildList {
-            repeat(maxGroupsCount) { index ->
-                add(emptySummary.invoke(index))
-            }
-        }
+fun FieldState.getValue(): String? {
+    return when (this) {
+        is CalculatedState -> value
+        is LinkedState -> value
+        is TextState -> value
+        else -> null
     }
 }

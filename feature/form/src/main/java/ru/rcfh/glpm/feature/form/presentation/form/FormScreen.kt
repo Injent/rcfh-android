@@ -66,6 +66,7 @@ import ru.rcfh.core.sdui.state.LinkedState
 import ru.rcfh.core.sdui.state.LocationState
 import ru.rcfh.core.sdui.state.RatioState
 import ru.rcfh.core.sdui.state.RepeatableState
+import ru.rcfh.core.sdui.state.Table4State
 import ru.rcfh.core.sdui.state.TableState
 import ru.rcfh.core.sdui.state.TextState
 import ru.rcfh.core.sdui.template.FormTab
@@ -259,6 +260,14 @@ private fun FormScreen(
                             modifier = theModifier
                         )
                     }
+                    is Table4State -> {
+                        AppItemCard(
+                            label = "Таблица 4",
+                            onClick = { openTable(field.id) },
+                            icon = AppIcons.Table,
+                            modifier = theModifier
+                        )
+                    }
                     is TableState -> {
                         AppItemCard(
                             label = field.name,
@@ -283,6 +292,7 @@ private fun FormScreen(
                     }
                     is CalculatedState -> {}
                     is LinkedState -> {}
+                    else -> Unit
                 }
             }
         }

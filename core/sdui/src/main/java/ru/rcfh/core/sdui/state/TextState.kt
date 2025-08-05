@@ -66,6 +66,8 @@ class TextState(
                 enabled = !event.isSet
             }
         }
+
+        if (document.initialized) onInitialized()
     }
 
     fun getParentDependency(): RefDependency? {

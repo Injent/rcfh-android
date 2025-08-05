@@ -145,7 +145,7 @@ fun ContentCell(
 @Composable
 fun ContentCell(
     text: String,
-    onClick: () -> Unit,
+    onClick: () -> Unit = {},
     modifier: Modifier = Modifier,
     customStyle: Boolean = false,
 ) {
