@@ -7,14 +7,14 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
-import ru.rcfh.core.model.UiTheme
+import ru.rcfh.core.model.DarkThemeConfig
 import ru.rcfh.data.util.SyncManager
 import ru.rcfh.datastore.SettingsRepository
 
 data class MainActivityUiState(
     val authed: Boolean = false,
     val loading: Boolean = true,
-    val uiTheme: UiTheme = UiTheme.LIGHT
+    val darkThemeConfig: DarkThemeConfig = DarkThemeConfig.LIGHT
 )
 
 class MainActivityViewModel(
@@ -29,7 +29,7 @@ class MainActivityViewModel(
             MainActivityUiState(
                 authed = it.currentUserId != null,
                 loading = false,
-                uiTheme = it.prefs.uiTheme
+                darkThemeConfig = it.prefs.darkThemeConfig
             )
         }
         .onStart {

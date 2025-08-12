@@ -19,6 +19,7 @@ import ru.rcfh.core.sdui.common.PostInitListener
 import ru.rcfh.core.sdui.common.RefDependency
 import ru.rcfh.core.sdui.common.Rule
 import ru.rcfh.core.sdui.common.Visual
+import ru.rcfh.core.sdui.event.CustomEvent
 import ru.rcfh.core.sdui.event.SetPlus
 import ru.rcfh.core.sdui.event.SetVariable
 import ru.rcfh.core.sdui.event.SetVnum
@@ -68,6 +69,14 @@ class TextState(
         }
 
         if (document.initialized) onInitialized()
+
+        if (id == "lvo") {
+            document.observeEvent(CustomEvent::class) { event ->
+                if (event.key != "srf") return@observeEvent
+
+                
+            }
+        }
     }
 
     fun getParentDependency(): RefDependency? {
@@ -94,6 +103,7 @@ class TextState(
     fun setReference(refDependency: RefDependency?, value: String) {
         this.refDependency = refDependency
         this.value = value
+
     }
 
     @JvmName("setVal")

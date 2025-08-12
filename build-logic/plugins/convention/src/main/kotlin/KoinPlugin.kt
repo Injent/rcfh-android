@@ -9,7 +9,18 @@ class KoinPlugin : Plugin<Project> {
     override fun apply(target: Project) = with(target) {
         dependencies {
             implementation(platform(libs["koin-bom"]))
-            implementation(libs["koin-android"])
+
+            pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
+                dependencies {
+                    implementation(libs["koin-core"])
+                }
+            }
+
+            pluginManager.withPlugin("com.android.base") {
+                dependencies {
+                    implementation(libs["koin-android"])
+                }
+            }
         }
     }
 }

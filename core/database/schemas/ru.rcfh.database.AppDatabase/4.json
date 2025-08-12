@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 4,
-    "identityHash": "f162d7dfdb1bdeed1dbf3e4bf29015fe",
+    "identityHash": "f993e946f09e7b079f6723d749f2e603",
     "entities": [
       {
         "tableName": "handbooks",
@@ -148,7 +148,7 @@
       },
       {
         "tableName": "documents",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `name` TEXT NOT NULL, `modification_timestamp` INTEGER NOT NULL, `owner_id` INTEGER NOT NULL, `options` TEXT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `name` TEXT NOT NULL, `modification_timestamp` INTEGER NOT NULL, `owner_id` INTEGER NOT NULL, `options` TEXT NOT NULL, `data` TEXT NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -177,6 +177,12 @@
           {
             "fieldPath": "options",
             "columnName": "options",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "data",
+            "columnName": "data",
             "affinity": "TEXT",
             "notNull": true
           }
@@ -233,7 +239,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f162d7dfdb1bdeed1dbf3e4bf29015fe')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f993e946f09e7b079f6723d749f2e603')"
     ]
   }
 }

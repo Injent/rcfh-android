@@ -22,12 +22,14 @@ import androidx.compose.foundation.text.input.KeyboardActionHandler
 import androidx.compose.foundation.text.input.OutputTransformation
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.then
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDatePickerState
@@ -51,7 +53,6 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
@@ -63,6 +64,8 @@ import ru.rcfh.designsystem.icon.Calendar
 import ru.rcfh.designsystem.icon.Cross
 import ru.rcfh.designsystem.icon.Handbook
 import ru.rcfh.designsystem.theme.AppTheme
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 @Composable
 fun ReferenceTextField(
@@ -117,11 +120,11 @@ fun ReferenceTextField(
                             },
                         )
                     )
-                }
+                },
+                enabled = enabled
             )
         },
         modifier = modifier
-            .alpha(if (enabled) 1f else 0.5f)
             .clickable(
                 interactionSource = interactionSource,
                 indication = null,
@@ -148,7 +151,7 @@ fun DateTextField(
     label: String? = null,
     onCard: Boolean = false,
     error: String? = null,
-    readOnly: Boolean = false,
+    enabled: Boolean = true,
     placeholder: String = "",
 ) {
     val interactionSource = remember { MutableInteractionSource() }
@@ -160,7 +163,7 @@ fun DateTextField(
         onValueChange = {},
         interactionSource = interactionSource,
         textStyle = AppTheme.typography.body.copy(color = AppTheme.colorScheme.foreground1),
-        readOnly = true,
+        readOnly = !enabled,
         visualTransformation = VisualTransformation.None,
         decorationBox = { innerTextField ->
             TextFieldDecorator(
@@ -179,17 +182,16 @@ fun DateTextField(
                 },
                 error = error,
                 isEmpty = value.isEmpty(),
+                enabled = enabled,
                 modifier = Modifier
-                    .clickable {
-                        if (!readOnly) {
-                            dialogOpen = true
-                        }
+                    .clickable(enabled = enabled) {
+                        dialogOpen = true
                     }
             )
         },
         modifier = modifier
             .onFocusChanged { focusState ->
-                if (focusState.isFocused && !readOnly) {
+                if (focusState.isFocused && enabled) {
                     dialogOpen = true
                 }
             }
@@ -234,7 +236,7 @@ fun AppTextField(
     onCard: Boolean = false,
     label: String? = null,
     error: String? = null,
-    readOnly: Boolean = false,
+    enabled: Boolean = true,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     button: @Composable (() -> Unit)? = null,
 ) {
@@ -242,9 +244,13 @@ fun AppTextField(
 
     BasicTextField(
         value = value,
-        onValueChange = {
-            if (inputTransformation(it)) {
-                onValueChange(it)
+        onValueChange = { newValue ->
+            if (inputTransformation(newValue)) {
+                onValueChange(
+                    if (lineLimits is TextFieldLineLimits.SingleLine) {
+                        newValue.replace(RemoveNextLineRegex, "")
+                    } else newValue
+                )
             }
         },
         interactionSource = interactionSource,
@@ -257,9 +263,9 @@ fun AppTextField(
         },
         maxLines = when (lineLimits) {
             is TextFieldLineLimits.MultiLine -> lineLimits.maxHeightInLines
-            TextFieldLineLimits.SingleLine -> 3
+            TextFieldLineLimits.SingleLine -> 1
         },
-        readOnly = readOnly,
+        readOnly = !enabled,
         visualTransformation = VisualTransformation.None,
         decorationBox = { innerTextField ->
             TextFieldDecorator(
@@ -274,6 +280,7 @@ fun AppTextField(
                 isEmpty = value.isEmpty(),
                 button = button,
                 error = error,
+                enabled = enabled
             )
         },
         modifier = modifier
@@ -355,7 +362,7 @@ fun AppTextField(
     leadingIcon: (@Composable () -> Unit)? = null,
     trailingIcon: @Composable () -> Unit = {},
     onCard: Boolean = false,
-    readOnly: Boolean = false,
+    enabled: Boolean = true,
     label: String? = null,
     button: (@Composable () -> Unit)? = null,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
@@ -380,12 +387,22 @@ fun AppTextField(
                 placeholder = placeholder,
                 button = button,
                 isEmpty = state.text.isEmpty(),
-                error = error
+                error = error,
+                enabled = enabled
             )
         },
-        readOnly = readOnly,
+        readOnly = !enabled,
         textStyle = AppTheme.typography.body.copy(color = AppTheme.colorScheme.foreground1),
-        inputTransformation = inputTransformation,
+        inputTransformation = InputTransformation {
+            val text = if (lineLimits is TextFieldLineLimits.SingleLine) {
+                asCharSequence().replace(RemoveNextLineRegex, "")
+            } else {
+                asCharSequence()
+            }
+            replace(0, length, text)
+        }.apply {
+            if (inputTransformation != null) then(inputTransformation)
+        },
         lineLimits = lineLimits,
         modifier = modifier,
     )
@@ -423,7 +440,7 @@ fun AppSecureTextField(
                 onCard = onCard,
                 placeholder = placeholder,
                 isEmpty = state.text.isEmpty(),
-                error = error
+                error = error,
             )
         },
         textStyle = AppTheme.typography.body.copy(color = AppTheme.colorScheme.foreground1),
@@ -433,7 +450,7 @@ fun AppSecureTextField(
 }
 
 @Composable
-private fun TextFieldDecorator(
+fun TextFieldDecorator(
     isEmpty: Boolean,
     innerTextField: @Composable () -> Unit,
     modifier: Modifier = Modifier,
@@ -445,9 +462,10 @@ private fun TextFieldDecorator(
     onCard: Boolean = false,
     placeholder: String = "",
     error: String? = null,
+    enabled: Boolean = true,
     lineLimits: TextFieldLineLimits = TextFieldLineLimits.SingleLine,
 ) {
-    Column(modifier) {
+    Column(modifier.alpha(if (enabled) 1f else 0.5f)) {
         label?.let {
             val subtitleColor = AppTheme.colorScheme.foreground2
             Text(
@@ -557,7 +575,8 @@ private fun TextFieldDecorator(
                 }
 
                 CompositionLocalProvider(
-                    LocalContentColor provides AppTheme.colorScheme.foreground2
+                    LocalContentColor provides AppTheme.colorScheme.foreground2,
+                    LocalTextStyle provides AppTheme.typography.callout
                 ) {
                     trailingIcon()
                 }
@@ -571,13 +590,16 @@ private fun TextFieldDecorator(
                 style = AppTheme.typography.callout,
                 color = AppTheme.colorScheme.foregroundError,
                 modifier = Modifier
-                    .padding(top = AppTheme.spacing.xs)
+                    .padding(
+                        top = AppTheme.spacing.xs,
+                        bottom = if (isFocused) AppTheme.spacing.l else AppTheme.spacing.xs
+                    )
             )
         }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalTime::class)
 @Composable
 private fun AppCalendarDialog(
     onDismissRequest: () -> Unit,
@@ -630,3 +652,5 @@ private fun AppCalendarDialog(
         }
     }
 }
+
+private val RemoveNextLineRegex = Regex("[\n\r]+")

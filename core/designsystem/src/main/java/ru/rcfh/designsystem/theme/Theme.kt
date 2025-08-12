@@ -1,6 +1,7 @@
 package ru.rcfh.designsystem.theme
 
 import android.app.Activity
+import android.os.Build.VERSION.SDK_INT
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -12,7 +13,7 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 import com.valentinilk.shimmer.LocalShimmerTheme
 import com.valentinilk.shimmer.defaultShimmerTheme
-import ru.rcfh.core.model.UiTheme
+import ru.rcfh.core.model.DarkThemeConfig
 
 object AppTheme {
     val colorScheme: ColorScheme
@@ -35,7 +36,7 @@ object AppTheme {
 
 @Composable
 fun AppTheme(
-    uiTheme: UiTheme = UiTheme.LIGHT,
+    darkThemeConfig: DarkThemeConfig = DarkThemeConfig.LIGHT,
     content: @Composable () -> Unit
 ) {
     val view = LocalView.current
@@ -46,6 +47,11 @@ fun AppTheme(
         SideEffect {
             val window = (view.context as Activity).window
             val insetsController = WindowCompat.getInsetsController(window, view)
+            if (SDK_INT >= 29) {
+                @Suppress("DEPRECATION")
+                window.isStatusBarContrastEnforced = false
+                window.isNavigationBarContrastEnforced = false
+            }
             insetsController.isAppearanceLightStatusBars = !colorScheme.isDarkTheme
             insetsController.isAppearanceLightNavigationBars = !colorScheme.isDarkTheme
             window.decorView.setBackgroundColor(colorScheme.background2.toArgb())

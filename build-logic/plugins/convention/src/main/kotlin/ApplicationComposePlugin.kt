@@ -3,7 +3,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.getByType
 import ru.rcfh.buildlogic.configureCompose
-import ru.rcfh.buildlogic.configureKotlin
+import ru.rcfh.buildlogic.configureKotlinAndroid
 
 class ApplicationComposePlugin : Plugin<Project> {
     override fun apply(target: Project) = with(target) {
@@ -11,7 +11,7 @@ class ApplicationComposePlugin : Plugin<Project> {
             apply("com.android.application")
             apply("org.jetbrains.kotlin.plugin.compose")
         }
-        configureKotlin(extensions.getByType<ApplicationExtension>())
+        configureKotlinAndroid(extensions.getByType<ApplicationExtension>())
         configureCompose(extensions.getByType<ApplicationExtension>())
     }
 }

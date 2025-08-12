@@ -49,4 +49,11 @@ interface DocumentDao {
             WHERE id = :documentId
     """)
     suspend fun updateOptions(documentId: Int, options: JsonElement)
+
+    @Query("""
+        UPDATE documents
+            SET data = :data
+            WHERE id = :documentId
+    """)
+    suspend fun updateData(documentId: Int, data: JsonElement)
 }

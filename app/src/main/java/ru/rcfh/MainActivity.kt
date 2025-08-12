@@ -1,6 +1,5 @@
 package ru.rcfh
 
-import android.os.Build.VERSION.SDK_INT
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -25,11 +24,7 @@ class MainActivity : ComponentActivity() {
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        if (SDK_INT >= 29) {
-            @Suppress("DEPRECATION")
-            window.isStatusBarContrastEnforced = false
-            window.isNavigationBarContrastEnforced = false
-        }
+
         var uiState by mutableStateOf(MainActivityUiState())
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {

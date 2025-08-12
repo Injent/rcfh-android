@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="core_ui_formTabName0">Форма ввода данных «Лесохозяйственного» адреса участка</string>
+    <string name="core_ui_formTabName1">Форма ввода таксационной информации</string>
+    <string name="core_ui_formTabName2">Форма ввода дополнительных сведений лесоустройства</string>
+    <string name="core_ui_formTabName3">Форма ввода ВНН за санитарным состоянием насаждений глазомерным методом</string>
+    <string name="core_ui_formTabName4">Форма ввода ВНН за лесопатологическим состоянием насаждений глазомерным методом</string>
+    <string name="core_ui_formTabName5">Сводка по насаждению и рекомендуемые мероприятия</string>
+    <string name="core_ui_formTabShortName0">I</string>
+    <string name="core_ui_formTabShortName1">II</string>
+    <string name="core_ui_formTabShortName2">III</string>
+    <string name="core_ui_formTabShortName3">IV</string>
+    <string name="core_ui_formTabShortName4">V</string>
+    <string name="core_ui_formTabShortName5">VI</string>
+</resources>

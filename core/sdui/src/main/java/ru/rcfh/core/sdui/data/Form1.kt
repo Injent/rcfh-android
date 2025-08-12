@@ -79,7 +79,7 @@ val Form1 = FormTemplate(
         Template.Text(
             id = "ulvo",
             label = "Уч. лесничество",
-            visual = Visual.Reference(handbookId = 36),
+            visual = Visual.Reference(handbookId = 37),
             rules = listOf(
                 Rule.Required("Участок не выбран")
             )
@@ -87,7 +87,7 @@ val Form1 = FormTemplate(
         Template.Text(
             id = "urc",
             label = "Урочище (лесная дача и т.п.)",
-            visual = Visual.Reference(handbookId = 36),
+            visual = Visual.Reference(handbookId = 38),
             rules = listOf(
                 Rule.Required("Урочище не выбрано")
             )

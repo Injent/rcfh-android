@@ -2,7 +2,7 @@ import com.android.build.gradle.LibraryExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
-import ru.rcfh.buildlogic.configureKotlin
+import ru.rcfh.buildlogic.configureKotlinAndroid
 import ru.rcfh.buildlogic.libs
 
 class LibraryPlugin : Plugin<Project> {
@@ -13,7 +13,7 @@ class LibraryPlugin : Plugin<Project> {
         }
 
         extensions.configure<LibraryExtension> {
-            configureKotlin(this)
+            configureKotlinAndroid(this)
             defaultConfig.targetSdk = libs.findVersion("targetSdk").get().toString().toInt()
 
             defaultConfig {

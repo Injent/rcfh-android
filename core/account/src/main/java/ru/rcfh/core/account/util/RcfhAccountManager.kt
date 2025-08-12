@@ -2,8 +2,10 @@ package ru.rcfh.core.account.util
 
 import android.accounts.Account
 import android.accounts.AccountManager
+import android.accounts.AccountManagerCallback
 import android.content.Context
 import android.os.Build
+import android.os.Bundle
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -46,23 +48,25 @@ class RcfhAccountManager(context: Context) {
 
         val result = suspendCoroutine { continuation ->
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
-                accountManager.removeAccount(account, null, { future ->
+                val callback = AccountManagerCallback<Bundle> { future ->
                     try {
                         continuation.resume(future.result
                             .getBoolean(AccountManager.KEY_BOOLEAN_RESULT))
                     } catch (e: Exception) {
                         continuation.resume(false)
                     }
-                }, null)
+                }
+                accountManager.removeAccount(account, null, callback, null)
             } else {
-                @Suppress("DEPRECATION")
-                accountManager.removeAccount(account, { future ->
+                val callback = AccountManagerCallback { future ->
                     try {
                         continuation.resume(future.result)
                     } catch (e: Exception) {
                         continuation.resume(false)
                     }
-                }, null)
+                }
+                @Suppress("DEPRECATION")
+                accountManager.removeAccount(account, callback, null)
             }
         }
         refreshAccountsFlow()

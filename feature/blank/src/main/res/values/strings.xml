@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_blank_placeholder_number">0.0</string>
+    <string name="feature_blank_placeholder_decimal">0</string>
+    <string name="feature_blank_placeholder_text">Ввод…</string>
+    <string name="feature_blank_placeholder_reference">Выбор из справочника</string>
+    <string name="feature_blank_error_required">Требует заполнения</string>
+    <string name="feature_blank_error_digitFormat0">Неверный формат числа</string>
+    <string name="feature_blank_error_digitFormat1">Не более %d цифр перед точкой</string>
+    <string name="feature_blank_error_digitFormat2">Не более %d цифр после точки</string>
+    <string name="feature_blank_error_range0">Число меньше чем %s</string>
+    <string name="feature_blank_error_range1">Число больше чем %s</string>
+
+    <string name="feature_blank_button_close">закрыть</string>
+    <string name="feature_blank_info_nothingIsFound">Ничего не найдено</string>
+
+    <string name="feature_blank_button_yes">Да</string>
+    <string name="feature_blank_button_add">Добавить</string>
+    <string name="feature_blank_button_delete">Удалить</string>
+    <string name="feature_blank_tab_origin">По материалам ТО</string>
+    <string name="feature_blank_tab_actual">Фактические</string>
+    <string name="feature_blank_info_switchSource">Использовать %s?</string>
+    <string name="feature_blank_info_entry">Запись %d</string>
+</resources>

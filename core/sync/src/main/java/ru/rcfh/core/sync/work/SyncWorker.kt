@@ -14,13 +14,13 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import ru.rcfh.common.AppDispatchers
 import ru.rcfh.core.sync.R
-import ru.rcfh.data.repository.HandbookRepository
+import ru.rcfh.data.handbook.HandbookManager
 
 class SyncWorker(
     appContext: Context,
     params: WorkerParameters
 ) : CoroutineWorker(appContext, params), KoinComponent {
-    private val handbookRepository by inject<HandbookRepository>()
+    private val handbookRepository by inject<HandbookManager>()
     private val dispatchers by inject<AppDispatchers>()
 
     override suspend fun getForegroundInfo(): ForegroundInfo {
@@ -30,7 +30,7 @@ class SyncWorker(
     override suspend fun doWork(): Result = withContext(dispatchers.ioDispatcher) {
         if (handbookRepository.sync()) {
             Result.success()
-        } else if (runAttemptCount < 3) {
+        } else if (runAttemptCount < 2) {
             Result.retry()
         } else Result.failure()
     }

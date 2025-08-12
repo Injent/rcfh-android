@@ -19,6 +19,7 @@ class FeaturePlugin : Plugin<Project> {
             implementation(project(":core:designsystem"))
             implementation(project(":core:navigation"))
             implementation(project(":core:model"))
+            implementation(project(":core:ui"))
 
             implementation(libs["kotlinx.coroutines.android"])
             implementation(libs["koin.compose"])

@@ -25,7 +25,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import org.koin.androidx.compose.koinViewModel
-import ru.rcfh.core.model.UiTheme
+import ru.rcfh.core.model.DarkThemeConfig
 import ru.rcfh.datastore.model.Prefs
 import ru.rcfh.designsystem.component.AppBackButton
 import ru.rcfh.designsystem.theme.AppTheme
@@ -82,23 +82,23 @@ private fun SettingsScreen(
                 .padding(innerPadding)
                 .selectableGroup()
         ) {
-            UiTheme.entries.forEach { uiTheme ->
+            DarkThemeConfig.entries.forEach { uiTheme ->
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(AppTheme.spacing.s),
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
                         .height(56.dp)
                         .selectable(
-                            selected = uiState.prefs.uiTheme == uiTheme,
+                            selected = uiState.prefs.darkThemeConfig == uiTheme,
                             onClick = {
-                                onUpdatePrefs(uiState.prefs.copy(uiTheme = uiTheme))
+                                onUpdatePrefs(uiState.prefs.copy(darkThemeConfig = uiTheme))
                             },
                             role = Role.RadioButton
                         )
                         .padding(horizontal = 16.dp)
                 ) {
                     RadioButton(
-                        selected = uiState.prefs.uiTheme == uiTheme,
+                        selected = uiState.prefs.darkThemeConfig == uiTheme,
                         onClick = null,
                         colors = RadioButtonDefaults.colors(
                             selectedColor = AppTheme.colorScheme.foreground,
@@ -107,8 +107,8 @@ private fun SettingsScreen(
                     )
                     Text(
                         text = when (uiTheme) {
-                            UiTheme.LIGHT -> R.string.option_light
-                            UiTheme.FOREST -> R.string.option_forest
+                            DarkThemeConfig.LIGHT -> R.string.option_light
+                            DarkThemeConfig.FOREST -> R.string.option_forest
                         }.let { stringResource(it) },
                         style = AppTheme.typography.calloutButton,
                         color = AppTheme.colorScheme.foreground1

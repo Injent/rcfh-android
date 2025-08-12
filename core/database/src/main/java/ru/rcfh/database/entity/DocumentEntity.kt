@@ -13,5 +13,6 @@ data class DocumentEntity(
     @ColumnInfo("name") val name: String,
     @ColumnInfo("modification_timestamp") val modificationTimestamp: LocalDateTime,
     @ColumnInfo("owner_id") val ownerId: Int,
-    @ColumnInfo("options") val options: JsonElement = buildJsonObject {}
+    @ColumnInfo("options") val options: JsonElement = buildJsonObject {},
+    @ColumnInfo("data") val data: JsonElement = buildJsonObject {}
 )

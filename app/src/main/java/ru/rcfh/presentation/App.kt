@@ -17,7 +17,7 @@ fun App(
     uiState: MainActivityUiState,
 ) {
     AppTheme(
-        uiTheme = uiState.uiTheme
+        darkThemeConfig = uiState.darkThemeConfig
     ) {
         Scaffold(
             contentWindowInsets = WindowInsets(0),

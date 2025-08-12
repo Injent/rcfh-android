@@ -262,7 +262,7 @@ private fun FormScreen(
                     }
                     is Table4State -> {
                         AppItemCard(
-                            label = "Таблица 4",
+                            label = field.name,
                             onClick = { openTable(field.id) },
                             icon = AppIcons.Table,
                             modifier = theModifier

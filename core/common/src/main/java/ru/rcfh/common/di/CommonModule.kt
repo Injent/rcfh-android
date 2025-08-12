@@ -7,7 +7,8 @@ import ru.rcfh.common.AppDispatchers
 val CommonModule = module {
     single {
         AppDispatchers(
-            ioDispatcher = Dispatchers.IO
+            ioDispatcher = Dispatchers.IO,
+            defaultDispatcher = Dispatchers.Default
         )
     }
 }

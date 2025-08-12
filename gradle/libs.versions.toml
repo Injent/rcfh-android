@@ -1,42 +1,41 @@
 [versions]
-compileSdk = "35"
-targetSdk = "35"
+compileSdk = "36"
+targetSdk = "36"
 minSdk = "21"
-composeCompiler = "1.5.15"
-agp = "8.9.2"
-kotlin = "2.1.0"
-coreKtx = "1.15.0"
+agp = "8.11.1"
+kotlin = "2.2.0"
+coreKtx = "1.16.0"
 activityCompose = "1.10.1"
-composeBom = "2025.06.00"
-ksp = "2.1.0-1.0.29"
-kotlinxSerialization = "1.7.3"
+composeBom = "2025.07.00"
+ksp = "2.2.0-2.0.2"
+kotlinxSerialization = "1.9.0"
 kotlinxCoroutines = "1.10.2"
-kotlinxDate = "0.6.2"
+kotlinxDate = "0.7.1"
 desugarJdkLibs = "2.1.5"
 work = "2.10.0"
 lifecycle = "2.8.7"
-room = "2.6.1"
-navigation = "2.8.9"
+room = "2.7.2"
+navigation = "2.9.3"
 datastore = "1.1.4"
 firebaseBom = "33.12.0"
 firebasePlugin = "3.0.3"
-koinBom = "4.0.2"
-protobuf = "4.26.0"
-protobufPlugin = "0.9.4"
-ktor = "2.3.12"
+koinBom = "4.1.0"
+ktor = "3.2.3"
 apiResult = "2.1.0"
 sheetsComposeDialogs = "1.3.0"
-androidxCrypto = "1.1.0-alpha06"
+androidxCrypto = "1.1.0"
 androidxSplashscreen = "1.0.1"
 grid = "2.2.1"
 infoBarCompose = "1.0.0"
 gmsLocation = "21.3.0"
 kotlinxCollections = "0.4.0"
-haze = "1.5.4"
+haze = "1.6.9"
 shimmer = "1.3.3"
-timber = "5.0.1"
 androidxAltitude = "1.0.0-alpha03"
-googleServicesPlugin = "4.4.2"
+googleServicesPlugin = "4.4.3"
+navigation3 = "1.0.0-alpha06"
+navigation3Lifecycle = "1.0.0-alpha04"
+clog = "4.1.1"
 
 [libraries]
 
@@ -55,6 +54,7 @@ compose-adaptive = { group = "androidx.compose.material3.adaptive", name = "adap
 compose-foundation = { group = "androidx.compose.foundation", name = "foundation" }
 compose-material3 = { group = "androidx.compose.material3", name = "material3" }
 compose-runtime = { group = "androidx.compose.runtime", name = "runtime" }
+compose-runtime-saveable = { group = "androidx.compose.runtime", name = "runtime-saveable" }
 compose-ui = { group = "androidx.compose.ui", name = "ui" }
 compose-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
 compose-ui-text = { group = "androidx.compose.ui", name = "ui-text" }
@@ -65,10 +65,12 @@ compose-ui-testManifest = { group = "androidx.compose.ui", name = "ui-test-manif
 compose-adaptive-layout = { group = "androidx.compose.material3.adaptive", name = "adaptive-layout" }
 compose-adaptive-navigation = { group = "androidx.compose.material3.adaptive", name = "adaptive-navigation" }
 
+androidx-navigation3-runtime = { module = "androidx.navigation3:navigation3-runtime", version.ref = "navigation3" }
+androidx-navigation3-ui = { module = "androidx.navigation3:navigation3-ui", version.ref = "navigation3" }
+androidx-lifecycle-viewmodel-navigation3 = { module = "androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "navigation3Lifecycle" }
+
 # DataStore
 datastore = { group = "androidx.datastore", name = "datastore", version.ref = "datastore" }
-protobuf-kotlin-lite = { group = "com.google.protobuf", name = "protobuf-kotlin-lite", version.ref = "protobuf" }
-protobuf-protoc = { group = "com.google.protobuf", name = "protoc", version.ref = "protobuf" }
 
 # Desugaring
 desugarJdkLibs = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "desugarJdkLibs" }
@@ -83,6 +85,7 @@ navigation-compose = { group = "androidx.navigation", name = "navigation-compose
 
 # KotlinX
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinxCoroutines" }
+kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinxCoroutines" }
 kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "kotlinxDate" }
 kotlinx-serialization = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
 kotlinx-collections-immutable = { group = "org.jetbrains.kotlinx", name = "kotlinx-collections-immutable", version.ref = "kotlinxCollections" }
@@ -97,6 +100,7 @@ ktor-auth = { group = "io.ktor", name = "ktor-client-auth", version.ref = "ktor"
 
 # Koin
 koin-bom = { group = "io.insert-koin", name = "koin-bom", version.ref = "koinBom" }
+koin-core = { group = "io.insert-koin", name = "koin-core" }
 koin-android = { group = "io.insert-koin", name = "koin-android" }
 koin-compose = { group = "io.insert-koin", name = "koin-androidx-compose" }
 koin-workManager = { group = "io.insert-koin", name = "koin-androidx-workmanager" }
@@ -127,13 +131,13 @@ sheetsComposeDialog-core = { group = "com.maxkeppeler.sheets-compose-dialogs", n
 grid = { group = "com.cheonjaeung.compose.grid", name = "grid", version.ref = "grid" }
 infoBarCompose = { group = "com.radusalagean", name = "info-bar-compose", version.ref = "infoBarCompose" }
 shimmer = { group = "com.valentinilk.shimmer", name = "compose-shimmer", version.ref = "shimmer" }
-
-timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
+clog = { module = "io.github.copper-leaf:clog-core", version.ref = "clog" }
 
 # Build logic plugins
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "agp" }
 kotlin-gradlePlugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
 ksp-gradlePlugin = { group = "com.google.devtools.ksp", name = "com.google.devtools.ksp.gradle.plugin", version.ref = "ksp" }
+compose-gradlePlugin = { module = "org.jetbrains.kotlin:compose-compiler-gradle-plugin", version.ref = "kotlin" }
 
 [plugins]
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
@@ -145,12 +149,12 @@ ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 google-services = { id = "com.google.gms.google-services", version.ref = "googleServicesPlugin" }
 firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebasePlugin" }
-protobuf = { id = "com.google.protobuf", version.ref = "protobufPlugin" }
 
 # Project plugins
 rcfh-application = { id = "rcfh.application", version = "unspecified" }
 rcfh-application-compose = { id = "rcfh.application.compose", version = "unspecified" }
 rcfh-library = { id = "rcfh.library", version = "unspecified" }
+rcfh-library-jvm = { id = "rcfh.library.jvm", version = "unspecified" }
 rcfh-library-compose = { id = "rcfh.library.compose", version = "unspecified" }
 rcfh-feature = { id = "rcfh.feature", version = "unspecified" }
 rcfh-koin = { id = "rcfh.koin", version = "unspecified" }

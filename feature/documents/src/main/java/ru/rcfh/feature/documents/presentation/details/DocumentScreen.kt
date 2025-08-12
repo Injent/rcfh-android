@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -53,16 +52,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.window.core.layout.WindowSizeClass
 import com.valentinilk.shimmer.ShimmerBounds
 import com.valentinilk.shimmer.rememberShimmer
-import com.valentinilk.shimmer.shimmer
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
-import ru.rcfh.core.sdui.data.FileCreator
 import ru.rcfh.designsystem.component.AppBackButton
 import ru.rcfh.designsystem.component.AppCard
 import ru.rcfh.designsystem.component.AppIcon
 import ru.rcfh.designsystem.component.AppIconButton
 import ru.rcfh.designsystem.component.AppItemCard
-import ru.rcfh.designsystem.component.AppSnackbarHost
 import ru.rcfh.designsystem.component.AppTextButton
 import ru.rcfh.designsystem.component.AppTextField
 import ru.rcfh.designsystem.component.SnackbarController
@@ -74,9 +70,9 @@ import ru.rcfh.designsystem.icon.DocumentSaved
 import ru.rcfh.designsystem.icon.Edit
 import ru.rcfh.designsystem.icon.StatusError
 import ru.rcfh.designsystem.icon.StatusSuccess
-import ru.rcfh.designsystem.icon.StatusWarning
 import ru.rcfh.designsystem.theme.AppTheme
 import ru.rcfh.feature.documents.R
+import ru.rcfh.glpm.ui.getFullName
 
 @Composable
 internal fun DocumentRoute(
@@ -131,7 +127,6 @@ internal fun DocumentRoute(
                                 tint = Color.Unspecified,
                                 actionLabel = context.getString(R.string.button_open),
                                 onAction = {
-                                    FileCreator.openFile(context)
                                 },
                             )
                         )
@@ -187,12 +182,6 @@ private fun DocumentScreen(
                 },
             )
         },
-        snackbarHost = {
-            AppSnackbarHost(
-                modifier = Modifier
-                    .navigationBarsPadding()
-            )
-        }
     ) { innerPadding ->
         val shimmerInstance = rememberShimmer(shimmerBounds = ShimmerBounds.Window)
 
@@ -214,6 +203,12 @@ private fun DocumentScreen(
                 val focusRequester = remember { FocusRequester() }
                 var textFieldReadOnly by rememberSaveable { mutableStateOf(true) }
                 val docName = rememberTextFieldState(uiState.document.name)
+
+                fun completeAndUpdate() {
+                    textFieldReadOnly = true
+                    onNameUpdate(docName.text.toString())
+                }
+
                 AppTextField(
                     state = docName,
                     label = stringResource(R.string.placeholder_documentName),
@@ -225,7 +220,10 @@ private fun DocumentScreen(
                         autoCorrectEnabled = true,
                         capitalization = KeyboardCapitalization.Sentences
                     ),
-                    readOnly = textFieldReadOnly,
+                    onKeyboardAction = {
+                        completeAndUpdate()
+                    },
+                    enabled = textFieldReadOnly,
                     button = {
                         Row(
                             horizontalArrangement = Arrangement.spacedBy(AppTheme.spacing.s)
@@ -258,10 +256,7 @@ private fun DocumentScreen(
                                     AppIconButton(
                                         icon = AppIcon(
                                             icon = AppIcons.Check,
-                                            onClick = {
-                                                textFieldReadOnly = true
-                                                onNameUpdate(docName.text.toString())
-                                            },
+                                            onClick = ::completeAndUpdate,
                                             tint = AppTheme.colorScheme.foregroundOnBrand
                                         ),
                                         containerColor = AppTheme.colorScheme.backgroundBrand
@@ -293,72 +288,72 @@ private fun DocumentScreen(
             }
             item {
                 Box(Modifier.animateContentSize()) {
-                    uiState.errorReport?.let { report ->
-                        val (icon, headline, message) = when {
-                            report.severe.isNotEmpty() -> Triple(
-                                AppIcons.StatusError,
-                                stringResource(R.string.headline_severe),
-                                buildString {
-                                    append(
-                                        stringResource(
-                                            R.string.text_severe,
-                                            context.resources.getQuantityString(
-                                                R.plurals.fields,
-                                                report.severe.size,
-                                                report.severe.size
-                                            )
-                                        )
-                                    )
-
-                                    if (report.warnings.isNotEmpty()) {
-                                        appendLine()
-                                        append(
-                                            stringResource(
-                                                R.string.text_warning,
-                                                context.resources.getQuantityString(
-                                                    R.plurals.fields,
-                                                    report.warnings.size,
-                                                    report.warnings.size
-                                                )
-                                            )
-                                        )
-                                    }
-                                }
-                            )
-                            report.warnings.isNotEmpty() -> Triple(
-                                AppIcons.StatusWarning,
-                                stringResource(R.string.headline_warning),
-                                stringResource(
-                                    R.string.text_warning,
-                                    context.resources.getQuantityString(
-                                        R.plurals.fields,
-                                        report.warnings.size,
-                                        report.warnings.size
-                                    )
-                                )
-                            )
-                            else -> Triple(
-                                AppIcons.StatusSuccess,
-                                stringResource(R.string.headline_success),
-                                stringResource(R.string.text_success)
-                            )
-                        }
-                        MessageInfoBar(
-                            icon = icon,
-                            headline = headline,
-                            text = message,
-                            onClick = if (report.hasErrors) {
-                                { onNavigateToSummarize() }
-                            } else null,
-                            modifier = Modifier
-                                .animateItem()
-                        )
-                    } ?: run {
-                        MessageInfoBarSkeleton(
-                            modifier = Modifier
-                                .shimmer(shimmerInstance)
-                        )
-                    }
+//                    uiState.errorReport?.let { report ->
+//                        val (icon, headline, message) = when {
+//                            report.severe.isNotEmpty() -> Triple(
+//                                AppIcons.StatusError,
+//                                stringResource(R.string.headline_severe),
+//                                buildString {
+//                                    append(
+//                                        stringResource(
+//                                            R.string.text_severe,
+//                                            context.resources.getQuantityString(
+//                                                R.plurals.fields,
+//                                                report.severe.size,
+//                                                report.severe.size
+//                                            )
+//                                        )
+//                                    )
+//
+//                                    if (report.warnings.isNotEmpty()) {
+//                                        appendLine()
+//                                        append(
+//                                            stringResource(
+//                                                R.string.text_warning,
+//                                                context.resources.getQuantityString(
+//                                                    R.plurals.fields,
+//                                                    report.warnings.size,
+//                                                    report.warnings.size
+//                                                )
+//                                            )
+//                                        )
+//                                    }
+//                                }
+//                            )
+//                            report.warnings.isNotEmpty() -> Triple(
+//                                AppIcons.StatusWarning,
+//                                stringResource(R.string.headline_warning),
+//                                stringResource(
+//                                    R.string.text_warning,
+//                                    context.resources.getQuantityString(
+//                                        R.plurals.fields,
+//                                        report.warnings.size,
+//                                        report.warnings.size
+//                                    )
+//                                )
+//                            )
+//                            else -> Triple(
+//                                AppIcons.StatusSuccess,
+//                                stringResource(R.string.headline_success),
+//                                stringResource(R.string.text_success)
+//                            )
+//                        }
+//                        MessageInfoBar(
+//                            icon = icon,
+//                            headline = headline,
+//                            text = message,
+//                            onClick = if (report.hasErrors) {
+//                                { onNavigateToSummarize() }
+//                            } else null,
+//                            modifier = Modifier
+//                                .animateItem()
+//                        )
+//                    } ?: run {
+//                        MessageInfoBarSkeleton(
+//                            modifier = Modifier
+//                                .shimmer(shimmerInstance)
+//                        )
+//                    }
                 }
             }
 
@@ -370,13 +365,13 @@ private fun DocumentScreen(
                 )
             }
             items(
-                items = uiState.forms
-            ) { form ->
+                items = uiState.formTabs
+            ) { formTab ->
                 AppItemCard(
                     onClick = {
-                        onNavigateToForm(form.formId)
+                        onNavigateToForm(formTab.formId)
                     },
-                    label = form.name,
+                    label = formTab.getFullName(context),
                     modifier = Modifier
                         .fillMaxWidth()
                 )

@@ -14,21 +14,12 @@ val DatabaseModule = module {
             AppDatabase::class.java,
             DATABASE_NAME
         )
-            .fallbackToDestructiveMigration()
+            .fallbackToDestructiveMigration(true)
             .build()
-
-        instance.openHelper.writableDatabase.execSQL("""
-            CREATE TRIGGER IF NOT EXISTS clear_refs_fts AFTER DELETE ON refs
-            BEGIN
-                DELETE FROM refs_fts WHERE rowid = old.rowid;
-            END;
-        """)
 
         return@single instance
     }
 
-    factory { get<AppDatabase>().handbookDao() }
-    factory { get<AppDatabase>().referenceDao() }
     factory { get<AppDatabase>().formDao() }
     factory { get<AppDatabase>().documentDao() }
 }

@@ -9,6 +9,12 @@ sealed interface Screen {
     data object Loading : Screen
 
     @Serializable
+    data class Viewer(
+        val documentId: Int,
+        val formId: Int = 1
+    ) : Screen
+
+    @Serializable
     data class FormNavigator(
         val documentId: Int,
         val formId: Int

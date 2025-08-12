@@ -52,7 +52,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.datetime.toJavaLocalDateTime
-import ru.rcfh.core.sdui.model.Document
+import ru.rcfh.data.model.DocumentInfo
 import ru.rcfh.designsystem.component.AppIcon
 import ru.rcfh.designsystem.component.AppIconButton
 import ru.rcfh.designsystem.component.AppSnackbarHost
@@ -283,7 +283,7 @@ private fun LazyListScope.documents(
 
 @Composable
 private fun DocumentItem(
-    document: Document,
+    document: DocumentInfo,
     onClick: () -> Unit,
     loading: Boolean,
     selected: Boolean,

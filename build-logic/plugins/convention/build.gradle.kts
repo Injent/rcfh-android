@@ -21,6 +21,7 @@ tasks.withType<KotlinJvmCompile>().configureEach {
 dependencies {
     compileOnly(libs.android.gradlePlugin)
     compileOnly(libs.kotlin.gradlePlugin)
+    compileOnly(libs.compose.gradlePlugin)
     compileOnly(libs.ksp.gradlePlugin)
 }
 
@@ -44,6 +45,10 @@ gradlePlugin {
         register("library") {
             id = "rcfh.library"
             implementationClass = "LibraryPlugin"
+        }
+        register("libraryJvm") {
+            id = "rcfh.library.jvm"
+            implementationClass = "LibraryJvmPlugin"
         }
         register("libraryCompose") {
             id = "rcfh.library.compose"

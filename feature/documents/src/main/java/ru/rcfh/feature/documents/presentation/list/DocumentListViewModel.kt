@@ -17,25 +17,23 @@ import kotlinx.coroutines.launch
 import pro.respawn.apiresult.onSuccess
 import ru.rcfh.core.account.model.RcfhAccount
 import ru.rcfh.core.account.repository.AccountRepository
-import ru.rcfh.core.sdui.data.DocumentRepository
-import ru.rcfh.core.sdui.model.Document
+import ru.rcfh.data.model.DocumentInfo
+import ru.rcfh.data.repository.DocumentRepository
 import ru.rcfh.navigation.Navigator
-import java.io.BufferedReader
-import java.io.InputStreamReader
 
 sealed interface DocumentListEvent {
     data class DocumentCreated(val documentId: Int) : DocumentListEvent
 }
 
 data class DocumentListUiState(
-    val documents: ImmutableList<Document> = persistentListOf(),
+    val documents: ImmutableList<DocumentInfo> = persistentListOf(),
     val currentAccount: RcfhAccount? = null,
     val accounts: List<RcfhAccount> = emptyList(),
     val loading: Boolean = true,
 )
 
 class DocumentListViewModel(
-    private val documentRepository: DocumentRepository,
+    private val documentCreator: DocumentRepository,
     private val accountRepository: AccountRepository,
 ) : ViewModel() {
     private var createJob: Job? = null
@@ -43,7 +41,7 @@ class DocumentListViewModel(
     val events = _events.receiveAsFlow()
 
     val uiState = combine(
-        documentRepository.documents,
+        documentCreator.documentInfos,
         accountRepository.accountsFlow,
         accountRepository.currentAccount
     ) { documents, accounts, currentAccount ->
@@ -63,8 +61,8 @@ class DocumentListViewModel(
     fun onCreateDocument(name: String) {
         createJob?.cancel()
         createJob = viewModelScope.launch {
-            documentRepository.create(
-                name.fetchDocumentName(uiState.value.documents.map(Document::name))
+            documentCreator.create(
+                name.prepareDocumentName(uiState.value.documents.map(DocumentInfo::name))
             )
                 .onSuccess { documentId ->
                     _events.send(DocumentListEvent.DocumentCreated(documentId))
@@ -79,17 +77,17 @@ class DocumentListViewModel(
     }
 
     fun importFile(context: Context, fileUri: Uri, onSave: (Int) -> Unit) {
-        viewModelScope.launch {
-            try {
-                context.contentResolver.openInputStream(fileUri)?.use { inputStream ->
-                    BufferedReader(InputStreamReader(inputStream)).use { reader ->
-                        onSave(documentRepository.import(reader.readText()))
-                    }
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
+//        viewModelScope.launch {
+//            try {
+//                context.contentResolver.openInputStream(fileUri)?.use { inputStream ->
+//                    BufferedReader(InputStreamReader(inputStream)).use { reader ->
+//                        onSave(documentCreator.import(reader.readText()))
+//                    }
+//                }
+//            } catch (e: Exception) {
+//                e.printStackTrace()
+//            }
+//        }
     }
 
     fun back() {
@@ -99,7 +97,7 @@ class DocumentListViewModel(
     }
 }
 
-private fun String.fetchDocumentName(existingDocumentNames: List<String>): String {
+private fun String.prepareDocumentName(existingDocumentNames: List<String>): String {
     val baseName = replace(Regex("\\s*\\(\\d+\\)\\s*$"), "")
 
     val findDupesRegex = Regex("\\Q$baseName\\E\\s*\\((\\d+)\\)")

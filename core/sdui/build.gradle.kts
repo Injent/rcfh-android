@@ -9,6 +9,7 @@ android.namespace = "ru.rcfh.glpm.core.sdui"
 
 dependencies {
     implementation(libs.compose.runtime)
+    implementation(libs.compose.runtime.saveable)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.gms.location)
     implementation(libs.androidx.altitude)

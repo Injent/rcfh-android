@@ -16,17 +16,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import ru.rcfh.MainActivityUiState
+import ru.rcfh.blank.presentation.viewer.viewerScreen
 import ru.rcfh.designsystem.theme.AppTheme
 import ru.rcfh.feature.documents.presentation.pane.documentsScreen
-import ru.rcfh.feature.documents.presentation.summarize.summarizeScreen
 import ru.rcfh.feature.login.presentation.signin.signInScreen
 import ru.rcfh.feature.login.presentation.signup.signUpScreen
 import ru.rcfh.feature.settings.presentation.settingsScreen
-import ru.rcfh.glpm.feature.form.presentation.comparisontable.comparisonTableScreen
-import ru.rcfh.glpm.feature.form.presentation.formnavigator.formNavigatorScreen
-import ru.rcfh.glpm.feature.form.presentation.handbooksearch.handbookSearchScreen
-import ru.rcfh.glpm.feature.form.presentation.table.tableScreen
-import ru.rcfh.glpm.feature.form.presentation.tablerecord.tableRecordScreen
 
 @Composable
 fun AppNavHost(
@@ -61,16 +56,18 @@ fun AppNavHost(
         modifier = modifier
     ) {
         composable<Screen.Loading> { }
-        formNavigatorScreen()
-        handbookSearchScreen()
-        tableScreen()
-        tableRecordScreen()
-        comparisonTableScreen()
+        viewerScreen()
+//        formNavigatorScreen()
+//        handbookSearchScreen()
+//        tableScreen()
+//        tableRecordScreen()
+//        comparisonTableScreen()
+//        summarizeScreen()
         documentsScreen()
         signUpScreen()
         signInScreen()
         settingsScreen()
-        summarizeScreen()
+
         composable<Screen.Guide> {
             Box(contentAlignment = Alignment.Center) {
                 Text(

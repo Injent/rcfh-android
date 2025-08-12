@@ -5,66 +5,39 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import ru.rcfh.core.sdui.common.ErrorReport
-import ru.rcfh.core.sdui.data.DocumentRepository
-import ru.rcfh.core.sdui.data.DocumentStateManager
-import ru.rcfh.core.sdui.data.FileCreator
-import ru.rcfh.core.sdui.data.FormRepo
-import ru.rcfh.core.sdui.model.Document
-import ru.rcfh.core.sdui.template.FormOptions
-import ru.rcfh.core.sdui.template.FormTab
+import ru.rcfh.core.model.FormTab
+import ru.rcfh.data.model.DocumentInfo
+import ru.rcfh.data.repository.DocumentRepository
 import ru.rcfh.navigation.Navigator
 import ru.rcfh.navigation.Screen
 
 sealed interface DocumentUiState {
     data class Success(
-        val document: Document,
-        val forms: List<FormTab>,
-        val errorReport: ErrorReport? = null,
+        val document: DocumentInfo,
+        val formTabs: List<FormTab.Tab>
     ) : DocumentUiState
     data object Loading : DocumentUiState
 }
 
 class DocumentViewModel(
-    formRepo: FormRepo,
     private val documentRepository: DocumentRepository,
-    private val documentStateManager: DocumentStateManager,
     private val documentId: Int,
 ) : ViewModel() {
     private var updateNameJob: Job? = null
-    private val errorReport = MutableStateFlow<ErrorReport?>(null)
+    //private val errorReport = MutableStateFlow<ErrorReport?>(null)
 
-    val uiState = combine(
-        documentRepository.getDocumentFlow(documentId),
-        flow { emit(formRepo.getDocumentTemplate()) },
-        errorReport,
-    ) { document, documentTemplate, report ->
-        if (document == null) return@combine DocumentUiState.Loading
-        val formIds = documentTemplate.forms.map { element ->
-            when (element) {
-                is FormOptions -> document.options.formOptions[element.optionId]
-                is FormTab -> element.formId
-            }
-        }
+    val uiState = documentRepository.getDocumentInfoFlow(documentId = documentId)
+        .map { document ->
+            if (document == null) return@map DocumentUiState.Loading
 
-        DocumentUiState.Success(
-            document = document,
-            forms = formRepo.getFormList().filter { it.formId in formIds },
-            errorReport = report,
-        )
-    }
-        .onStart {
-            viewModelScope.launch {
-                documentStateManager.loadDocument(documentId)
-                errorReport.value = documentStateManager.detectErrors()
-            }
+            DocumentUiState.Success(
+                document = document,
+                formTabs = FormTab.fromIds(document.formsInUse).filterIsInstance<FormTab.Tab>()
+            )
         }
         .stateIn(
             scope = viewModelScope,
@@ -73,26 +46,25 @@ class DocumentViewModel(
         )
 
     fun exportFile(context: Context, onSave: (Uri) -> Unit) {
-        viewModelScope.launch {
-            documentRepository.export(documentId)?.let { content ->
-                FileCreator.createFileInDownloads(
-                    context = context,
-                    fileName = (uiState.value as DocumentUiState.Success).document.name,
-                    content = content
-                )
-            }?.let(onSave)
-        }
+//        viewModelScope.launch {
+//            documentRepository.export(documentId)?.let { content ->
+//                FileCreator.createFileInDownloads(
+//                    context = context,
+//                    fileName = (uiState.value as DocumentUiState.Success).document.name,
+//                    content = content
+//                )
+//            }?.let(onSave)
+//        }
     }
 
     fun detectErrors() {
         viewModelScope.launch {
-            errorReport.value = documentStateManager.detectErrors()
+            //errorReport.value = documentStateManager.detectErrors()
         }
     }
 
     fun deleteDocument(onComplete: () -> Unit) {
         viewModelScope.launch {
-            documentStateManager.closeUnsaved()
             documentRepository.delete(documentId)
             onComplete()
         }
@@ -109,7 +81,7 @@ class DocumentViewModel(
     fun navigateToForm(formId: Int) {
         viewModelScope.launch {
             Navigator.navigate(
-                Screen.FormNavigator(
+                Screen.Viewer(
                     documentId = documentId,
                     formId = formId
                 )
@@ -120,7 +92,7 @@ class DocumentViewModel(
     fun updateName(name: String) {
         updateNameJob?.cancel()
         updateNameJob = viewModelScope.launch {
-            documentRepository.updateName(documentId = documentId, name = name.trim())
+            documentRepository.rename(documentId = documentId, newName = name.trim())
         }
     }
 }

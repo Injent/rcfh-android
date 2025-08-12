@@ -1,6 +1,3 @@
 plugins {
-    alias(libs.plugins.rcfh.library)
-    alias(libs.plugins.rcfh.serialization)
+    alias(libs.plugins.rcfh.library.jvm)
 }
-
-android.namespace = "ru.rcfh.core.model"

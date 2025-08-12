@@ -62,13 +62,11 @@ dependencies {
     implementation(projects.core.navigation)
     implementation(projects.core.sync)
     implementation(projects.core.account)
-    implementation(projects.core.sdui)
 
     // Feature modules
-    implementation(projects.feature.form)
+    implementation(projects.feature.blank)
     implementation(projects.feature.login)
     implementation(projects.feature.documents)
-    implementation(projects.feature.home)
     implementation(projects.feature.settings)
 
     // Core libs

@@ -2,6 +2,7 @@ package ru.rcfh.network.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonObject
 
 @Serializable
 data class NetworkHandbookCollection(
@@ -17,20 +18,6 @@ data class NetworkHandbookCollection(
         @SerialName("name")
         val name: String,
         @SerialName("references")
-        val references: List<Reference>
-    ) {
-        @Serializable
-        data class Reference(
-            @SerialName("id")
-            val id: Int,
-            @SerialName("name")
-            val name: String,
-            @SerialName("description")
-            val description: String? = null,
-            @SerialName("sign_codes")
-            val signCodes: List<Int>? = null,
-            @SerialName("code")
-            val code: Int? = null
-        )
-    }
+        val references: List<JsonObject>
+    )
 }

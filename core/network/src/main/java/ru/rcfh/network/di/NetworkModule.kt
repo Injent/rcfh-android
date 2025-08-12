@@ -15,7 +15,6 @@ import kotlinx.serialization.json.Json
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 import ru.rcfh.network.ktor.KtorService
-import timber.log.Timber
 
 val NetworkModule = module {
     single {
@@ -42,7 +41,7 @@ val NetworkModule = module {
             install(Logging) {
                 logger = object : Logger {
                     override fun log(message: String) {
-                        Timber.tag("Ktor").d(message)
+                        println(message)
                     }
                 }
                 level = LogLevel.ALL
